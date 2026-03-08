@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>real-bank</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue@next"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/vuex@4.0.0/dist/vuex.global.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vuetify@3.3.15/dist/vuetify.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vuetify@3.3.15/dist/vuetify.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+    <script src="https://kit.fontawesome.com/c5df20466c.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div id="app">
+        <div v-if="show" class="w-full h-[100vh]">
+            <div v-if="CurrentScreen == 'Password'" class="w-full h-full flex items-center justify-center" style="background-image: url(./img/login-backgrond.png); background-size: 100% 100%;">
+                <div class="w-[40%] h-[50%] flex flex-col">
+                    <div class="w-full h-[5%]"></div>
+                    <div class="w-full h-[15%] flex items-center justify-center">
+                        <h2 style="
+                        color: #000;
+                        text-align: center;
+                        font-family: regular;
+                        font-size: 3.5551vw;
+                        font-style: normal;
+                        font-weight: 600;
+                        line-height: 4.5394vw; /* 127.687% */
+                        ">
+                        {{ PasswordScreenTypeFunction('First') }} 
+                        </h2>
+                    </div>
+                    <div class="w-full h-[10%]">
+                        <h2 style="
+                        color: #000;
+                        text-align: center;
+                        font-family: regular;
+                        font-size: 1.891vw;
+                        font-style: normal;
+                        font-weight: 400;
+                        line-height: 2.4146vw;  /* 127.687% */
+                        ">
+                        {{ PasswordScreenTypeFunction('Second') }} 
+                        </h2>
+                    </div>
+                    <div class="w-full h-[10%]"></div>
+                    <div class="w-full h-[25%] flex flex-wrap items-center justify-center">
+                        <input class="w-full h-[95%] pin-input" v-model="PinInput" :type="ShowPin ? 'number' : 'password'" style="border: .0618vw solid #8B8B8B; border-radius: .1853vw;" pattern="/^-?\d+\.?\d*$/" onKeyPress="if(this.value.length == 8) return false;" @mouseover="ShowPin = true" @mouseleave="ShowPin = false">
+                    </div>
+                    <div class="w-full h-[8%]"></div>
+                    <div class="w-full h-[16.8%] flex items-center justify-center">
+                        <div class="w-full h-full flex items-center justify-center hover:cursor-pointer" 
+                        style="
+                        background: black; 
+                        color: white; 
+                        font-size: 1.4949vw; 
+                        font-family: regular; 
+                        text-align: center; 
+                        font-weight: 700; 
+                        font-style: normal; 
+                        cursor: pointer;
+                        line-height: 1.9089vw;"
+
+                        @click="ConfirmPassword()"
+                        >
+                        {{Language['confirm']}}
+                        </div>
+                    </div>
+                    <div class="w-full h-[1%]" v-if="PasswordScreenType == 'Normal'"></div>
+                    <div class="w-full h-[4%] flex items-center justify-center" v-if="PasswordScreenType == 'Normal'">
+                        <span class="hover:cursor-pointer" style="font-size: 1vw; font-family: regular;" @click="ChangePasswordScreen('IBAN')">{{Language['login_with_iban']}}</span>
+                    </div>
+                    <div class="w-full h-[5.2%]" v-if="PasswordScreenType == 'Normal'"></div>
+                    <div class="w-full h-[10.2%]" v-else></div>
+                </div>
+            </div>
+            <div v-if="CurrentScreen == 'IBAN'" class="w-full h-full flex items-center justify-center" style="background-image: url(./img/login-backgrond.png); background-size: 100% 100%;">
+                <div class="w-[40%] h-[50%] flex flex-col">
+                    <div class="w-full h-[5%]"></div>
+                    <div class="w-full h-[15%] flex items-center justify-center">
+                        <h2 style="
+                        color: #000;
+                        text-align: center;
+                        font-family: regular;
+                        font-size: 3.5551vw;
+                        font-style: normal;
+                        font-weight: 600;
+                        line-height: 4.5394vw; /* 127.687% */
+                        ">
+                        {{ PasswordScreenTypeFunction('First') }} 
+                        </h2>
+                    </div>
+                    <div class="w-full h-[10%]">
+                        <h2 style="
+                        color: #000;
+                        text-align: center;
+                        font-family: regular;
+                        font-size: 1.891vw;
+                        font-style: normal;
+                        font-weight: 400;
+                        line-height: 2.4146vw;  /* 127.687% */
+                        ">
+                        {{ PasswordScreenTypeFunction('Second') }} 
+                        </h2>
+                    </div>
+                    <div class="w-full h-[10%]"></div>
+                    <div class="w-full h-[25%] flex flex-col items-center justify-center">
+                        <div class="w-full h-[49%] flex items-center justify-center">
+                            <input class="w-full h-[80%] mb-[1%] iban-input" placeholder="IBAN" v-model="IBANInput" type="number" style="border: .0618vw solid #8B8B8B; border-radius: .1853vw;" pattern="/^-?\d+\.?\d*$/" onKeyPress="if(this.value.length == 4) return false;">
+                        </div>
+                        <div class="w-full h-[49%] flex flex-wrap">
+                            <div class="w-full h-full flex items-center justify-center">
+                                <input class="w-full h-[80%] password-input" placeholder="PASSWORD" v-model="PasswordInput" :type="ShowPin ? 'number' : 'password'" style="border: .0618vw solid #8B8B8B; border-radius: .1853vw;" pattern="/^-?\d+\.?\d*$/" onKeyPress="if(this.value.length == 8) return false;" @mouseover="ShowPin = true" @mouseleave="ShowPin = false">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="w-full h-[8%]"></div>
+                    <div class="w-full h-[16.8%] flex items-center justify-center">
+                        <div class="w-full h-full flex items-center justify-center hover:cursor-pointer" 
+                        style="
+                        background: black; 
+                        color: white; 
+                        font-size: 1.4949vw; 
+                        font-family: regular; 
+                        text-align: center; 
+                        font-weight: 700; 
+                        font-style: normal; 
+                        cursor: pointer;
+                        line-height: 1.9089vw;"
+
+                        @click="ConfirmLoginAnotherAccount()"
+                        >
+                        {{Language['confirm']}}
+                        </div>
+                    </div>
+                    <div class="w-full h-[1%]"></div>
+                    <div class="w-full h-[4%] flex items-center justify-center">
+                        <span class="hover:cursor-pointer" style="font-size: 1vw; font-family: regular;" @click="ChangePasswordScreen('Password')">{{Language['login_with_normal']}}</span>
+                    </div>
+                    <div class="w-full h-[5.2%]"></div>
+                </div>
+            </div>
+            <div v-if="CurrentScreen == 'BankScreen'" class="w-full h-full flex flex-col" style="background-image: url(./img/background.png); background-size: 100% 100%;">
+                <div class="w-full h-[6%]"></div>
+                <div class="w-full h-[94%] flex flex-wrap">
+                    <div class="w-[20%] h-full">  <!-- Left menu -->
+                        <div class="w-full h-[8%] flex flex-wrap">  <!-- LM - Personal details -->
+                            <div class="w-[9%] h-full"></div>
+                            <div class="w-[16%] h-full flex items-center justify-center">
+                                <div class="w-full h-[95%] flex items-center justify-center">
+                                    <img :src="PlayersProfilePicture" class="profile-pic">
+                                </div>
+                            </div>
+                            <div class="w-[5.3%] h-full"></div>
+                            <div class="w-[69%] h-full flex flex-col">
+                                <div class="w-full h-[50%] flex items-center justify-start">
+                                    <span class="w-full" 
+                                    style="
+                                    color: #000;
+                                    font-family: regular;
+                                    font-size: 1.5203vw;
+                                    font-style: normal;
+                                    font-weight: 700;
+                                    line-height: normal;
+                                    ">
+                                    {{ PlayersName }}
+                                    </span>
+                                </div>
+                                <div class="w-full h-[50%] flex items-start justify-start">
+                                    <span class="w-full" 
+                                    style="
+                                    color: #797979;
+                                    font-family: regular;
+                                    font-size: .9196vw;
+                                    font-style: normal;
+                                    font-weight: 500;
+                                    line-height: normal;
+                                    ">
+                                    {{Language['welcome']}}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="w-[.7%] h-full"></div>
+                        </div>
+                        <div class="w-full h-[4%]"></div>
+                        <div class="w-full h-[35%] flex flex-wrap">
+                            <div class="w-[10%] h-full"></div>
+                            <div class="w-[72%] h-full flex flex-col">  <!-- LM - Menu Items -->
+
+                                <div class="w-full h-[17%] flex flex-wrap rounded-[.4208vw] hover:cursor-pointer" @click="ChangeMiddleSection('Main')" :style="{background: MiddleMenuSection == 'Main' ? '#EFECEF' : ''}"> <!-- MI - Dashboard -->
+                                    <div class="w-[6%] h-full"></div>
+                                    <div class="w-[14%] h-full flex items-center justify-center">
+                                        <img :src="MiddleMenuSection == 'Main' ? './img/Dashboard-icon.png' : './img/Dashboard-gray-icon.png'">
+                                    </div>
+                                    <div class="w-[15%] h-full"></div>
+                                    <div class="w-[50%] h-full flex items-center">
+                                        <span class="dashboard-label" :style="{color: MiddleMenuSection == 'Main' ? '#000' : '#959595'}">
+                                        {{Language['dashboard']}}
+                                        </span>
+                                    </div>
+                                    <div class="w-[15%] h-full"></div>
+                                </div>
+
+                                <div class="w-full h-[8%] "></div>
+
+                                <div class="w-full h-[17%] flex flex-wrap rounded-[.4208vw] hover:cursor-pointer" @click="ChangeMiddleSection('Invoices')" :style="{background: MiddleMenuSection == 'Invoices' ? '#EFECEF' : ''}" v-if="Logintype != 'hacker'">  <!-- MI - Invoices -->
+                                    <div class="w-[6%] h-full"></div>
+                                    <div class="w-[14%] h-full flex items-center justify-center">
+                                        <img :src="MiddleMenuSection == 'Invoices' ? './img/Invoices-icon.png' : './img/Invoices-gray-icon.png'">
+                                    </div>
+                                    <div class="w-[15%] h-full"></div>
+                                    <div class="w-[50%] h-full flex items-center ">
+                                        <span class="invoices-label" :style="{color: MiddleMenuSection == 'Invoices' ? '#000' : '#959595'}">
+                                        {{Language['invoices']}}
+                                        </span>
+                                    </div>
+                                    <div class="w-[15%] h-full"></div>
+                                </div>
+
+                                <div class="w-full h-[8%] "></div>
+
+                                <div class="w-full h-[17%] flex flex-wrap rounded-[.4208vw] hover:cursor-pointer" @click="ChangeMiddleSection('Credit')" :style="{background: MiddleMenuSection == 'Credit' ? '#EFECEF' : ''}" v-if="Logintype != 'hacker'">  <!-- MI - Lonas/Credits --> 
+                                    <div class="w-[6%] h-full"></div>
+                                    <div class="w-[14%] h-full flex items-center justify-center ">
+                                        <img :src="MiddleMenuSection == 'Credit' ? './img/Loan-icon.png' : './img/Loan-gray-icon.png'">
+                                    </div>
+                                    <div class="w-[15%] h-full"></div>
+                                    <div class="w-[50%] h-full flex items-center ">
+                                        <span class="loans-label" :style="{color: MiddleMenuSection == 'Credit' ? '#000' : '#959595'}">
+                                        {{Language['credits']}}
+                                        </span>
+                                    </div>
+                                    <div class="w-[15%] h-full"></div>
+                                </div>
+                                <div class="w-full h-[33%] "></div>
+                            </div>
+                            <div class="w-[18%] h-full"></div>
+                        </div>
+                        <div class="w-full h-[53%]"></div>
+                    </div>
+                    <div class="w-[28%] h-full" v-if="MiddleMenuSection == 'Main'">  <!-- Middle menu - Main -->
+                        <div class="w-full h-[7%]"></div>
+                        <div class="w-full h-[26.8%] flex flex-wrap">  <!-- Credit Card Box -->
+                            <div class="w-[7.5%] h-full"></div>
+                            <div class="w-[78.5%] h-full rounded-[1.5vw]" :style="{background: CardStyle == 1 ? 'url(img/FirstCard.png)' : 'url(img/SecondCard.png)'}" style="background-size: 100% 100%;">
+                                <div class="w-full h-full flex flex-col" v-if="CardStyle == 1">  <!-- First Card -->
+                                    <div class="w-full h-[70%]"></div>
+                                    <div class="w-full h-[11%] flex flex-wrap">
+                                        <div class="w-[4%] h-full"></div>
+                                        <div class="w-[67%] h-full flex items-center justify-start"> 
+                                            <h1 
+                                            style="
+                                            color: #646464;
+                                            font-family: regular;
+                                            font-size: 1.2248vw;
+                                            font-style: normal;
+                                            font-weight: 600;
+                                            line-height: 1.4363vw; /* 127.687% */
+                                            letter-spacing: .0675vw;
+                                            ">{{ PlayersName }}</h1> 
+                                        </div>
+                                        <div class="w-[29%] h-full"></div>
+                                    </div>
+                                    <div class="w-[50%] h-[2%]"></div>
+                                    <div class="w-full h-[11%] flex flex-wrap">
+                                        <div class="w-[4%] h-full"></div>
+                                        <div class="w-[66.5%] h-full flex items-center justify-start">
+                                            <h1 
+                                            style="
+                                            color: #A4A4A4;
+                                            font-family: regular;
+                                            font-size: 1.4248vw;
+                                            font-style: normal;
+                                            font-weight: 600;
+                                            line-height: 1.4363vw; /* 127.687% */
+                                            letter-spacing: .0675vw;
+                                            ">{{'XXXX XXXX XXXX ' + PlayerIBAN}}</h1>
+                                        </div>
+                                        <div class="w-[29%] h-full flex flex-wrap">
+                                            <div class="w-[20%] h-full"></div>
+                                            <div class="w-[70%] h-full flex items-center justify-start">
+                                                <h1 
+                                                style="
+                                                color: #A4A4A4;
+                                                font-family: regular;
+                                                font-size: 1.4248vw;
+                                                font-style: normal;
+                                                font-weight: 600;
+                                                line-height: 1.4363vw; /* 127.687% */
+                                                letter-spacing: .0675vw;
+                                                ">09/25</h1>
+                                            </div>
+                                            <div class="w-[10%] h-full"></div>
+                                        </div>
+                                        <div class="w-[.5%] h-full"></div>
+                                    </div>
+                                    <div class="w-full h-[6%]"></div>
+                                    <div class="exp">Exp</div>
+                                </div>
+
+                                <div class="w-full h-full flex flex-col" v-if="CardStyle == 2">  <!-- Second Card -->
+                                    <div class="w-full h-[13%]"></div>
+                                    <div class="w-full h-[6%] flex flex-wrap">
+                                        <div class="w-[4.8%] h-full"></div>
+                                        <div class="w-[65%] h-full flex items-center justify-start bg-red">
+                                            <span class="name-on-card2">{{ PlayersName }}</span>
+                                        </div>
+                                        <div class="w-[30.2%] h-full"></div>
+                                    </div>
+                                    <div class="w-full h-[3.5%]"></div>
+                                    <div class="w-full h-[7%] flex flex-wrap">
+                                        <div class="w-[5%] h-full"></div>
+                                        <div class="w-[55%] h-full flex items-end justify-start">
+                                            <div class="card-number2">{{'XXXX XXXX XXXX ' + PlayerIBAN}}</div>
+                                        </div>
+                                        <div class="w-[40%] h-full"></div>
+                                    </div>
+                                    <div class="w-full h-[10%] flex flex-wrap">
+                                        <div class="w-[5%] h-full"></div>
+                                        <div class="w-[35%] h-full flex items-start justify-start">
+                                            <div class="exp2">Exp 09/25</div>
+                                        </div>
+                                        <div class="w-[60%] h-full"></div>
+                                    </div>
+                                    <div class="w-full h-[60.5%]"></div>
+                                </div>
+                            </div>
+                            <div class="w-[14%] h-full"></div>
+                        </div>
+                        <div class="w-full h-[6.9%]"></div>
+                        <div class="w-full h-[6.8%] flex flex-wrap">  <!-- Actions Box -->
+                            <div class="w-[10%] h-full"></div>
+                            <div class="w-[12.5%] h-full flex items-center justify-center"> <!-- Send Money -->
+                                <div class="w-full h-full rounded-[50%] bg-[#D9D9D9] hover:cursor-pointer flex items-center justify-center" @click="ChangeMiddleSection('Transfer')">
+                                    <img src="./img/Send-icon.png" style="width: 1.4063vw; height: 1.4063vw;">
+                                </div>
+                            </div>
+                            <div class="w-[7.5%] h-full"></div>
+                            <div class="w-[12.5%] h-full flex items-center justify-center"> <!-- Withdraw Money -->
+                                <div class="w-full h-full rounded-[50%] bg-[#D9D9D9] hover:cursor-pointer flex items-center justify-center" @click="SelectActionMethod(true, 'withdraw')">
+                                    <img src="./img/Withdraw-icon.png" style="width: 1.7708vw; height: 1.3542vw;">
+                                </div>
+                            </div>
+                            <div class="w-[7.7%] h-full"></div>
+                            <div class="w-[12.7%] h-full flex items-center justify-center"> <!-- Deposit Money -->
+                                <div class="w-full h-full rounded-[50%] bg-[#D9D9D9] hover:cursor-pointer flex items-center justify-center" @click="SelectActionMethod(true, 'deposit')">
+                                    <img src="./img/Loan-icon.png" style="width: 1.5625vw; height: 1.3542vw;">
+                                </div>
+                            </div>
+                            <div class="w-[8%] h-full"></div>
+                            <div class="w-[12.5%] h-full flex items-center justify-center"> <!-- Log Out -->
+                                <div class="w-full h-full rounded-[50%] bg-[#D9D9D9] hover:cursor-pointer flex items-center justify-center" @click="LogOut()">
+                                    <img src="./img/Logout-icon.png" style="width: 1.4063vw; height: 1.4063vw;">
+                                </div>
+                            </div>
+                            <div class="w-[16.65%] h-full"></div>
+                        </div>
+                        <div class="w-full h-[.9%]"></div>
+                        <div class="w-full h-[2%] flex flex-wrap">  <!-- Actions Name Box -->
+                            <div class="w-[12.5%] h-full"></div>
+                            <div class="w-[9%] h-full flex items-center justify-start">  <!-- Send Text -->
+                                <span class="send-text">{{Language['send']}}</span>
+                            </div>
+                            <div class="w-[8%] h-full"></div>
+                            <div class="w-[16%] h-full flex items-center justify-start">  <!-- Withdraw Text -->
+                                <span class="withdraw-text">{{Language['withdraw']}}</span>
+                            </div>
+                            <div class="w-[5.7%] h-full"></div>
+                            <div class="w-[13%] h-full flex items-center justify-start">  <!-- Deposit Text -->
+                                <span class="deposit-text">{{Language['deposit']}}</span>
+                            </div>
+                            <div class="w-[6.3%] h-full"></div>
+                            <div class="w-[14%] h-full flex items-center justify-start">  <!-- Log Out Text -->
+                                <span class="logout-text">{{Language['logout']}}</span>
+                            </div>
+                            <div class="w-[15.6%] h-full"></div>
+                        </div>
+                        <div class="w-full h-[41.6%] grid">
+                            <div class="w-full h-full box1">
+                                <div class="w-full h-[32%]"></div>
+                                <div class="w-full h-[6%] flex flex-wrap" v-if="Logintype !== 'hacker'">  <!-- Fast Action Text -->
+                                    <div class="w-[10%] h-full"></div>
+                                    <div class="w-[33%] h-full flex items-center justify-start"> <!-- FAT - Content  -->
+                                        <span class="fast-action-text">{{Language['fast_actions']}}</span>
+                                    </div>
+                                    <div class="w-[57%] h-full"></div>
+                                </div>
+                                <div class="w-full h-[7%]"></div>
+                                <div class="w-full h-[55%] flex flex-wrap">  <!-- Fast Action Items -->
+                                    <div class="w-[10%] h-full"></div>
+                                    <div class="w-[23%] h-full" v-if="Logintype !== 'hacker'">  <!-- FAI - First Item -->
+                                        <div class="w-full h-full flex items-center justify-center rounded-[1vw] bg-[#F0ECF0]">
+                                            <div class="w-[70%] h-[90%] flex flex-col">
+                                                <div class="w-full h-[36%] flex items-center justify-center">
+                                                    <div class="w-[75%] h-[88%] rounded-[50%] flex items-center justify-center bg-[#D9D9D9]">
+                                                        <img v-if="FirstFastAction.type == 'deposit'" src="./img/Loan-icon.png" style="width: 1.5625vw; height: 1.3542vw;">
+                                                        <img v-else src="./img/Withdraw-icon.png" style="width: 1.7708vw; height: 1.3542vw;">
+                                                    </div>
+                                                </div>
+                                                <div class="w-full h-[9.8%]"></div>
+                                                <div class="w-full h-[9.5%] flex items-center justify-center">
+                                                    <span class="action-s-text">{{ FirstFastAction.type[0].toUpperCase() + FirstFastAction.type.slice(1) }}</span>
+                                                </div>
+                                                <div class="w-full h-[6.5%] flex items-center justify-center">
+                                                    <span class="w-full action-s-text2">{{ FirstFastAction.amount }}$ {{ FirstFastAction.type[0].toUpperCase() + FirstFastAction.type.slice(1) }}</span>
+                                                </div>
+                                                <div class="w-full h-[9%]"></div>
+                                                <div class="w-full h-[10%] flex items-center justify-center">
+                                                    <span class="action-amount-text">{{FirstFastAction.amount}}$</span>
+                                                </div>
+                                                <div class="w-full h-[8.4%]"></div>
+                                                <div class="w-full h-[10.8%] flex items-center justify-center">
+                                                    <div class="w-[90%] h-full flex items-center justify-center bg-black hover:cursor-pointer rounded-[.2vw]" @click="FastAction(FirstFastAction.type, FirstFastAction.amount)">
+                                                        <span class="action-text">{{ FirstFastAction.type[0].toUpperCase() + FirstFastAction.type.slice(1) }}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="w-[4.1%] h-full"></div>
+                                    <div class="w-[23%] h-full" v-if="Logintype !== 'hacker'">  <!-- FAI - Second Item -->
+                                        <div class="w-full h-full flex items-center justify-center rounded-[1vw] bg-[#F0ECF0]">
+                                            <div class="w-[70%] h-[90%] flex flex-col">
+                                                <div class="w-full h-[36%] flex items-center justify-center">
+                                                    <div class="w-[75%] h-[88%] rounded-[50%] flex items-center justify-center bg-[#D9D9D9]">
+                                                        <img v-if="SecondFastAction.type == 'deposit'" src="./img/Loan-icon.png" style="width: 1.5625vw; height: 1.3542vw;">
+                                                        <img v-else src="./img/Withdraw-icon.png" style="width: 1.7708vw; height: 1.3542vw;">
+                                                    </div>
+                                                </div>
+                                                <div class="w-full h-[9.8%]"></div>
+                                                <div class="w-full h-[9.5%] flex items-center justify-center">
+                                                    <span class="action-s-text">{{ SecondFastAction.type[0].toUpperCase() + SecondFastAction.type.slice(1) }}</span>
+                                                </div>
+                                                <div class="w-full h-[6.5%] flex items-center justify-center">
+                                                    <span class="w-full action-s-text2">{{ SecondFastAction.amount }}$ {{ SecondFastAction.type[0].toUpperCase() + SecondFastAction.type.slice(1) }}</span>
+                                                </div>
+                                                <div class="w-full h-[9%]"></div>
+                                                <div class="w-full h-[10%] flex items-center justify-center">
+                                                    <span class="action-amount-text">{{ SecondFastAction.amount }}$</span>
+                                                </div>
+                                                <div class="w-full h-[8.4%]"></div>
+                                                <div class="w-full h-[10.8%] flex items-center justify-center">
+                                                    <div class="w-[90%] h-full flex items-center justify-center bg-black hover:cursor-pointer rounded-[.2vw]" @click="FastAction(SecondFastAction.type, SecondFastAction.amount)">
+                                                        <span class="action-text">{{ SecondFastAction.type[0].toUpperCase() + SecondFastAction.type.slice(1) }}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="w-[4.1%] h-full"></div>
+                                    <div class="w-[23%] h-full" v-if="Logintype !==  'hacker'">  <!-- FAI - Third Item -->
+                                        <div class="w-full h-full flex items-center justify-center rounded-[1vw] bg-[#F0ECF0]">
+                                            <div class="w-[70%] h-[90%] flex flex-col">
+                                                <div class="w-full h-[36%] flex items-center justify-center">
+                                                    <div class="w-[75%] h-[88%] rounded-[50%] flex items-center justify-center bg-[#D9D9D9]">
+                                                        <img v-if="ThirdFastAction.type == 'deposit'" src="./img/Loan-icon.png" style="width: 1.5625vw; height: 1.3542vw;">
+                                                        <img v-else src="./img/Withdraw-icon.png" style="width: 1.7708vw; height: 1.3542vw;">
+                                                    </div>
+                                                </div>
+                                                <div class="w-full h-[9.8%]"></div>
+                                                <div class="w-full h-[9.5%] flex items-center justify-center">
+                                                    <span class="action-s-text">{{ ThirdFastAction.type[0].toUpperCase() + ThirdFastAction.type.slice(1) }}</span>
+                                                </div>
+                                                <div class="w-full h-[6.5%] flex items-center justify-center">
+                                                    <span class="w-full action-s-text2">{{ ThirdFastAction.amount }}$ {{ ThirdFastAction.type[0].toUpperCase() + ThirdFastAction.type.slice(1) }}</span>
+                                                </div>
+                                                <div class="w-full h-[9%]"></div>
+                                                <div class="w-full h-[10%] flex items-center justify-center">
+                                                    <span class="action-amount-text">{{ ThirdFastAction.amount }}$</span>
+                                                </div>
+                                                <div class="w-full h-[8.4%]"></div>
+                                                <div class="w-full h-[10.8%] flex items-center justify-center">
+                                                    <div class="w-[90%] h-full flex items-center justify-center bg-black hover:cursor-pointer rounded-[.2vw]" @click="FastAction(ThirdFastAction.type, ThirdFastAction.amount)">
+                                                        <span class="action-text">{{ ThirdFastAction.type[0].toUpperCase() + ThirdFastAction.type.slice(1) }}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="w-[12.8%] h-full"></div>
+                                </div>
+                            </div>
+                            <div class="w-full h-full box2" v-if="DWPopup">
+                                <div class="w-full h-[6.2%]"></div>
+                                <div class="w-full h-[60.8%] flex flex-wrap">
+                                    <div class="w-[7.75%] h-full"></div>
+                                    <div class="w-[81.75%] h-full flex items-center justify-center">
+                                        <div class="w-[98%] h-full flex flex-col border-[#C7C7C7] border-[.1vw] rounded-[.7vw] bg-[#F6F2F6] popup-open" :class="{'animate__animated animate__bounceInDown' : DWPopup}" v-if="CheckAnimationStatus">  <!-- Deposit/Withdraw PopUp -->
+                                            <div class="w-full h-[7.4%]"></div>
+                                            <div class="w-full h-[11.5%] flex flex-wrap">  <!-- Deposit/Withdraw Exit & Header -->
+                                                <div class="w-[4.2%] h-full"></div>
+                                                <div class="w-[7%] h-full flex items-center justify-center">
+                                                    <img src="./img/Loan-icon.png" style="width: 1.5625vw; height: 1.3542vw;" v-if="DWType == 'deposit'">
+                                                    <img src="./img/Withdraw-icon.png" style="width: 1.7708vw; height: 1.3542vw;" v-else>
+                                                </div>
+                                                <div class="w-[2%] h-full"></div>
+                                                <div class="w-[22%] h-full flex items-center justify-start">
+                                                    <span style="color: #000; text-align: center; font-family: regular; font-size: 1.2202vw; font-style: normal; font-weight: 600; line-height: 1.5581vw;">{{ DWType === 'withdraw' ? 'Withdraw' : 'Deposit' }}</span>
+                                                </div>
+                                                <div class="w-[55.2%] h-full"></div>
+                                                <div class="w-[7%] h-full flex items-center justify-center hover:cursor-pointer" @click="SelectActionMethod(false, '')"> 
+                                                    <img src="./img/Close-icon.png" style="width: 1.5104vw; height: 1.4583vw;">
+                                                </div>
+                                                <div class="w-[2.6%] h-full"></div>
+                                            </div>
+                                            <div class="w-full h-[5.4%]"></div>
+                                            <div class="w-full h-[3%] flex flex-wrap">
+                                                <div class="w-[4.2%] h-full"></div>
+                                                <div class="w-[92.9%] h-full flex items-center justify-center">
+                                                    <div class="w-[99%] h-[30%] rounded-[2vw] bg-[#C7C7C7]"></div>
+                                                </div>
+                                                <div class="w-[4.2%] h-full"></div>
+                                            </div>
+                                            <div class="w-full h-[10%]"></div>
+                                            <div class="w-full h-[21%] flex flex-wrap">  <!-- Deposit/Withdraw Amount => Input etc. -->
+                                                <div class="w-[5%] h-full"></div>
+                                                <div class="w-[11.9%] h-full flex items-center justify-center">
+                                                    <div class="w-full h-[99%] flex items-center justify-center border-[.1vw] border-[#D7D7D7] rounded-[.2vw]">
+                                                        <span style="color: #262626; text-align: center; font-family: regular; font-size: 1.3253vw; font-style: normal; font-weight: 600; line-height: 1.9476vw;">$</span>
+                                                    </div>
+                                                </div>
+                                                <div class="w-[1%] h-full"></div>
+                                                <div class="w-[78.8%] h-full flex items-center justify-center">
+                                                    <div class="w-full h-[99%] flex items-center justify-center border-[.1vw] border-[#D7D7D7] rounded-[.2vw]">
+                                                        <input class="w-full h-full dw-input" type="number" v-model="DWInput" pattern="/^-?\d+\.?\d*$/">
+                                                    </div>
+                                                </div>
+                                                <div class="w-[3.3%] h-full"></div>
+                                            </div>
+                                            <div class="w-full h-[8.8%]"></div>
+                                            <div class="w-full h-[22%] flex flex-wrap">  <!-- Deposit/Withdraw Button -->
+                                                <div class="w-[5%] h-full"></div>
+                                                <div class="w-[91.7%] h-full flex items-center justify-center">
+                                                    <div class="w-full h-full flex items-center justify-center hover:cursor-pointer bg-black" @click="DepositWithdrawAction()">
+                                                        <span class="w-full" style="color: #FFF; text-align: center; font-family: regular; font-size: .8513vw; font-style: normal; font-weight: 700; line-height: 1.087vw;">
+                                                            {{ DWType == 'withdraw' ? 'Withdraw Money' : DWType == 'deposit' ? 'Deposit Money' : '' }}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div class="w-[3.3%] h-full"></div>
+                                            </div>
+                                            <div class="w-full h-[11.1%]"></div>
+                                        </div>
+                                    </div>
+                                    <div class="w-[10.6%] h-full"></div>
+                                </div>
+                                <div class="w-full h-[33%]"></div>
+                            </div>
+                        </div>
+                        <div class="w-full h-[8%]"></div>
+                    </div> 
+                    <div class="w-[28%] h-full" v-if="MiddleMenuSection == 'Transfer'">  <!-- Middle menu - Transfer -->
+                        <div class="w-full h-[7%]"></div>
+                        <div class="w-full h-[9%] flex flex-wrap">  <!-- Header -->
+                            <div class="w-[5.5%] h-full"></div>
+                            <div class="w-[77.5%] h-full flex flex-col">
+                                <div class="w-full h-[35%] flex items-center justify-center">
+                                    <h1 class="w-full send-money-text">{{Language['send_money']}}</h1>
+                                </div>
+                                <div class="w-full h-[16%]"></div>
+                                <div class="w-full h-[49%] flex items-center justify-start">
+                                    <span class="w-full send-money-description-text">{{Language['send_money_desc']}}</span>  <!-- Max 18-20 words -->
+                                </div>
+                            </div>
+                            <div class="w-[17%] h-full"></div>
+                        </div>
+                        <div class="w-full h-[1.5%]"></div>
+                        <div class="w-full h-[4.5%] flex flex-wrap">  <!-- Search bar -->
+                            <div class="w-[4%] h-full"></div>
+                            <div class="w-[84%] h-full flex items-center justify-center">
+                                <div class="w-full h-full flex flex-wrap border-[.1vw] border-[#D7D7D7] rounded-[.2vw]">
+                                    <div class="w-[2%] h-full"></div>
+                                    <div class="w-[5%] h-full flex items-center justify-center">
+                                        <img src="./img/Search-icon.png" style="width: .8333vw; height: .8333vw;">
+                                    </div>
+                                    <div class="w-[3%] h-full"></div>
+                                    <div class="w-[90%] h-full flex items-center justify-center">
+                                        <input class="w-full h-full search-bar" type="text" placeholder="Enter Name, Lastname or IBAN" v-model="SearchBar">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="w-[12%] h-full"></div>
+                        </div>
+                        <div class="w-full h-[2%]"></div>
+                        <div class="w-full h-[71.5%] flex flex-wrap">  <!-- Transfer - Player list -->
+                            <div class="w-[4%] h-full"></div>
+                            <div class="w-[84%] h-full block overflow-y-auto overflow-x-hidden">
+                                <div class="w-full h-[10%] mb-[.7042vw] rounded-[.8333vw] bg-[#F0ECF0] flex flex-col select-div expand-transition" v-for="data in SearchBarFunction" :style="{ height: SelectPlayer == data.id ? '24%' : '10%' }">
+                                    <div class="w-full flex flex-wrap" :class="{'h-[41.55%]': SelectPlayer == data.id, 'h-full': SelectPlayer != data.id}">
+                                        <div class="w-[3.5%] h-full"></div>
+                                        <div class="w-[12%] h-full flex items-center justify-center">
+                                            <div class="w-full h-[75%] rounded-[50%]">
+                                                <img class="w-full h-full" :src="data.pp">
+                                            </div>
+                                        </div>
+                                        <div class="w-[3%] h-full"></div>
+                                        <div class="w-[30%] h-full flex flex-col">
+                                            <div class="w-full h-[27%]"></div>
+                                            <div class="w-full h-[22%] flex items-center justify-start">
+                                                <span class="search-bar-playername">{{ data.playername }}</span>
+                                            </div>
+                                            <div class="w-full h-[5%]"></div>
+                                            <div class="w-full h-[18%] flex items-center justify-start">
+                                                <span class="search-bar-user w-full">{{Language['user']}}</span>
+                                            </div>
+                                            <div class="w-full h-[28%]"></div>
+                                        </div>
+                                        <div class="w-[24%] h-full"></div>
+                                        <div class="w-[23.5%] h-full flex items-center justify-center" v-if="SelectPlayer != data.id">
+                                            <div class="w-full h-[40%] flex items-center justify-center bg-black rounded-[.2vw] hover:cursor-pointer" @click="SelectTransferPlayer(data.id)">
+                                                <span style="color: #FFF; text-align: center; font-family: regular; font-size: .6054vw; font-style: normal; font-weight: 600; line-height: .773vw;">{{Language['select']}}</span>
+                                            </div>
+                                        </div>
+                                        <div class="w-[23.5%] h-full flex items-center justify-end" v-else>
+                                            <img class="hover:cursor-pointer" src="./img/Close-icon-circle.png" style="width: .9896vw; height: .9896vw;" @click="SelectTransferPlayer(data.id)">
+                                        </div>
+                                        <div class="w-[4%] h-full"></div>
+                                    </div>
+                                    <div class="w-full h-[58.45%] flex flex-col" v-if="SelectPlayer == data.id">
+                                        <div class="w-full h-[5%]"></div>
+                                        <div class="w-full h-[35%] flex flex-wrap items-center justify-start">
+                                            <div class="w-[4%] h-full"></div>
+                                            <div class="w-[8%] h-full flex items-center justify-center rounded-[.1vw] border-[.0321vw] border-[#D7D7D7]">
+                                                <span style="color: #262626; text-align: center; font-family: regular; font-size: .8951vw; font-style: normal; font-weight: 600; line-height: 1.1429vw;">$</span>
+                                            </div>
+                                            <div class="w-[2%] h-full"></div>
+                                            <div class="w-[40%] h-full flex items-center justify-center rounded-[.1vw] border-[.0321vw] border-[#D7D7D7]">
+                                                <input class="w-full h-full outline-none" type="number" v-model="transferInput" style="color: #262626; font-family: regular; font-size: .8951vw; font-style: normal; font-weight: 600; line-height: 1.1429vw; margin: 0 .5vw 0 .5vw;">
+                                            </div>
+                                            <div class="w-[46%] h-full"></div>
+                                        </div>
+                                        <div class="w-full h-[10%]"></div>
+                                        <div class="w-full h-[35%] flex flex-wrap">
+                                            <div class="w-[4%] h-full"></div>
+                                            <div class="w-[50%] h-full flex items-center justify-center">
+                                                <div class="w-full h-full flex items-center justify-center rounded-[.1vw] bg-[#000000] hover:cursor-pointer" @click="TransferMoney(data.id, data.iban)">
+                                                    <span class="w-full" style="color: #FFF; text-align: center; font-family: regular; font-size: .5996vw; font-style: normal; font-weight: 700; line-height: .6379vw;">{{Language['send_money']}}</span>
+                                                </div>
+                                            </div>
+                                            <div class="w-[46%] h-full"></div>
+                                        </div>
+                                        <div class="w-full h-[15%]"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="w-[12%] h-full"></div>
+                        </div>
+                        <div class="w-full h-[4.5%]"></div>
+                    </div>
+                    <div class="w-[28%] h-full" v-if="MiddleMenuSection == 'Invoices'">  <!-- Middle menu - Invoices -->
+                        <div class="w-full h-[7%]"></div>
+                        <div class="w-full h-[9%] flex flex-wrap">  <!-- Header -->
+                            <div class="w-[5.5%] h-full"></div>
+                            <div class="w-[77.5%] h-full flex flex-col">
+                                <div class="w-full h-[35%] flex items-center justify-center">
+                                    <h1 class="w-full send-money-text">{{Language['your_invoices']}}</h1>
+                                </div>
+                                <div class="w-full h-[16%]"></div>
+                                <div class="w-full h-[49%] flex items-center justify-start">
+                                    <span class="w-full send-money-description-text">{{Language['invoices_desc']}}</span>  <!-- Max 18-20 words -->
+                                </div>
+                            </div>
+                            <div class="w-[17%] h-full"></div>
+                        </div>
+                        <div class="w-full h-[4%]"></div>
+                        <div class="w-full h-[73.5%] flex flex-wrap" v-if="Invoices.length !== 0">  <!-- Invoices - List -->
+                            <div class="w-[4%] h-full"></div>
+                            <div class="w-[84%] h-full block overflow-y-auto overflow-x-hidden">
+                                <div class="w-full h-[14%] mb-[.7042vw] rounded-[.8333vw] bg-[#F0ECF0] flex flex-wrap" v-for="data in Invoices">
+                                    <div class="w-[3.5%] h-full"></div>
+                                    <div class="w-[17%] h-full flex items-center justify-center">
+                                        <div class="w-[85%] h-[63%] flex items-center justify-center rounded-[50%] bg-[#D9D9D945]">
+                                            <div class="w-[40%] h-[40%] rounded-[.2vw]" :class="{'bg-[#5EA7C7]': Billstheme == 'blue', 'bg-[#C75E5E]': Billstheme == 'red', 'bg-[#5EC7C0]': Billstheme == 'lightblue', 'bg-[#C7A95E]': Billstheme == 'yellow'}"></div>
+                                        </div>
+                                    </div>
+                                    <div class="w-[3%] h-full"></div>
+                                    <div class="w-[35%] h-full flex flex-col">
+                                        <div class="w-full h-[27%]"></div>
+                                        <div class="w-full h-[22%] flex items-center justify-start">
+                                            <span class="invoice-name">{{ data.sender }}</span>
+                                        </div>
+                                        <div class="w-full h-[5%]"></div>
+                                        <div class="w-full h-[24%]">
+                                            <span class="invoice-description w-full h-full block box-border overflow-auto">{{ Billsframe == 'qb' ? data.society : (Billsframe == 'esx' ? data.label : '') }}</span>
+                                        </div>
+                                        <div class="w-full h-[22%]"></div>
+                                    </div>
+                                    <div class="w-[5%] h-full"></div>
+                                    <div class="w-[33.5%] h-full flex flex-col">
+                                        <div class="w-full h-[25%]"></div>
+                                        <div class="w-full h-[50%] flex flex-wrap">
+                                            <div class="w-[49%] h-full flex items-center justify-center">
+                                                <span class="invoice-price overflow-auto" :class="{'text-[#5EA7C7]': Billstheme == 'blue', 'text-[#C75E5E]': Billstheme == 'red', 'text-[#5EC7C0]': Billstheme == 'lightblue', 'text-[#C7A95E]': Billstheme == 'yellow'}">{{ '$' + PE3D(data.amount) }}</span>
+                                            </div>
+                                            <div class="w-[2%] h-full"></div>
+                                            <div class="w-[49%] h-full flex items-center justify-center">
+                                                <div class="w-full h-[50%] flex items-center justify-center bg-[#5EA7C7] rounded-[.2vw] hover:cursor-pointer" :class="{'bg-[#5EA7C7]': Billstheme == 'blue', 'bg-[#C75E5E]': Billstheme == 'red', 'bg-[#5EC7C0]': Billstheme == 'lightblue', 'bg-[#C7A95E]': Billstheme == 'yellow'}" @click="PayBill(data.id, data.amount)">
+                                                    <span class="w-full" style="color: #FFF; text-align: center; font-family: regular; font-size: .6367vw; font-style: normal; font-weight: 600; line-height: .813vw;">{{Language['pay']}}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="w-full h-[25%]"></div>
+                                    </div>
+                                    <div class="w-[2%] h-full"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="w-full h-[73.5%] flex items-start justify-center" v-else>
+                            <span style="color: #B3B3B3; text-align: center; font-family: regular; font-size: 1.6299vw; font-style: normal; font-weight: 600; line-height: 2.0811vw;">{{Language['no_invoices']}}</span>
+                        </div>
+                        <div class="w-full h-[6.5%]"></div>
+                    </div>
+                    <div class="w-[28%] h-full" v-if="MiddleMenuSection == 'Credit' && Debts == 0">  <!-- Middle menu - Credit -->
+                        <div class="w-full h-[7%]"></div>
+                        <div class="w-full h-[12%] flex flex-wrap">  <!-- Header -->
+                            <div class="w-[5.5%] h-full"></div>
+                            <div class="w-[77.5%] h-full flex flex-col">
+                                <div class="w-full h-[35%] flex items-center justify-center">
+                                    <h1 class="w-full send-money-text">{{Language['get_credit']}}</h1>
+                                </div>
+                                <div class="w-full h-[16%]"></div>
+                                <div class="w-full h-full flex items-center justify-start">
+                                    <span class="w-full credit-description">{{Language['get_credit_desc']}}</span>  <!-- Max 20 words -->
+                                </div>
+                            </div>
+                            <div class="w-[17%] h-full"></div>
+                        </div>
+                        <div class="w-full h-[73.5%] flex flex-col">  <!-- Middle menu - Content -->
+                            <div class="w-full h-[8.5%] flex flex-wrap">
+                                <div class="w-[6%] h-full"></div>
+                                <div class="w-[11.5%] h-full flex items-center justify-center">
+                                    <div class="w-full h-full flex items-center justify-center rounded-[50%] bg-[#D9D9D945]">
+                                        <img src="./img/Select-credit-icon.png" style="width: 1.3021vw; height: 1.1458vw;">
+                                    </div>
+                                </div>
+                                <div class="w-[2.8%] h-full"></div>
+                                <div class="w-[16.5%] h-full flex items-center justify-center">
+                                    <div class="w-full h-[5%] bg-[#000000]"></div>
+                                </div>
+                                <div class="w-[3.2%] h-full"></div>
+                                <div class="w-[11.5%] h-full flex items-center justify-center">
+                                    <div class="w-full h-full flex items-center justify-center rounded-[50%] bg-[#D9D9D945]">
+                                        <img src="./img/Thumbsup-icon.png" style="width: 1.3542vw; height: 1.1979vw;">
+                                    </div>
+                                </div>
+                                <div class="w-[3%] h-full"></div>
+                                <div class="w-[17%] h-full flex items-center justify-center">
+                                    <div class="w-full h-[5%] bg-[#000000] opacity-[.13]" :class="{'opacity-[1]': ConfirmCredit}"></div>
+                                </div>
+                                <div class="w-[3.3%] h-full"></div>
+                                <div class="w-[11.5%] h-full flex items-center justify-center">
+                                    <div class="w-full h-full flex items-center justify-center rounded-[50%] bg-[#D9D9D945]">
+                                        <img src="./img/Money-icon.png" style="width: 1.4583vw; height: .8854vw;">
+                                    </div>
+                                </div>
+                                <div class="w-[14%] h-full"></div>
+                            </div>
+                            <div class="w-full h-[1%]"></div>
+                            <div class="w-full h-[2.2%] flex flex-wrap">  <!-- Credit Content - Info -->
+                                <div class="w-[4.5%] h-full"></div>
+                                <div class="w-[22%] h-full flex items-center justify-start">
+                                    <span style="color: #000; text-align: center; font-family: regular; font-size: .9356vw; font-style: normal; font-weight: 600; line-height: 1.1946vw;">{{Language['select_credit']}}</span>
+                                </div>
+                                <div class="w-[12.5%] h-full"></div>
+                                <div class="w-[19%] h-full flex items-center justify-start">
+                                    <span style="color: #000; text-align: center; font-family: regular; font-size: .9356vw; font-style: normal; font-weight: 600; line-height: 1.1946vw; margin-left: .6vw;">{{Language['accept']}}</span>
+                                </div>
+                                <div class="w-[14.5%] h-full"></div>
+                                <div class="w-[21%] h-full flex items-center justify-start">
+                                    <span style="color: #000; text-align: center; font-family: regular; font-size: .9356vw; font-style: normal; font-weight: 600; line-height: 1.1946vw;">{{Language['get_money']}}</span>
+                                </div>
+                                <div class="w-[6.5%] h-full"></div>
+                            </div>
+                            <div class="w-full h-[6%]"></div>
+                            <div class="w-full h-[33%] flex flex-wrap" v-if="!ConfirmCredit">
+                                <div class="w-[4%] h-full"></div>
+                                <div class="w-[25.5%] h-full flex items-center justify-center">  <!-- Credit Content - Home Credit -->
+                                    <div class="w-full h-full flex flex-col bg-[#F0ECF0] rounded-[.5vw]">
+                                        <div class="w-full h-[4.5%]"></div>
+                                        <div class="w-full h-[32%] flex flex-wrap">
+                                            <div class="w-[21%] h-full"></div>
+                                            <div class="w-[59%] h-full flex items-center justify-center">
+                                                <div class="w-full h-full flex items-center justify-center rounded-[50%] bg-[#D9D9D945]">
+                                                    <img src="./img/House-icon.png" style="width: 1.4063vw; height: 1.4583vw;">
+                                                </div>
+                                            </div>
+                                            <div class="w-[20%] h-full"></div>
+                                        </div>
+                                        <div class="w-full h-[9%]"></div>
+                                        <div class="w-full h-[7%] flex items-center justify-center">
+                                            <span style="color: #000; text-align: center; font-family: regular; font-size: 1.0607vw; font-style: normal; font-weight: 600; line-height: 1.3544vw;">{{Language['home_credit']}}</span>
+                                        </div>
+                                        <div class="w-full h-[3%]"></div>
+                                        <div class="w-full h-[15%] flex items-center justify-center">
+                                            <span style="color: #595959; text-align: center; font-family: regular; font-size: .5835vw; font-style: normal; font-weight: 500; line-height: .5vw;">{{Language['home_credit_desc']}}</span>
+                                        </div>
+                                        <div class="w-full h-[11%]"></div>
+                                        <div class="w-full h-[10%] flex items-center justify-center">
+                                            <div class="w-[69%] h-full flex items-center justify-center bg-[#000000] rounded-[.2vw] hover:cursor-pointer" :class="{'bg-[#9E5EC7]': SelectCreditType == 'Home'}" @click="SelectCreditTypeFunction('Home')">
+                                                <span style="color: #FFF; text-align: center; font-family: regular; letter-spacing: .06vw; font-size: .5979vw; font-style: normal; font-weight: 600; line-height: .6358vw;">{{SelectCreditType == 'Home' ? 'Selected' : 'Select'}}</span>
+                                            </div>
+                                        </div>
+                                        <div class="w-full h-[8.5%]"></div>
+                                    </div>
+                                </div>
+                                <div class="w-[4.5%] h-full"></div>
+                                <div class="w-[25.5%] h-full flex items-center justify-center">  <!-- Credit Content - Installment Credit -->
+                                    <div class="w-full h-full flex flex-col bg-[#F0ECF0] rounded-[.5vw]">
+                                        <div class="w-full h-[4.5%]"></div>
+                                        <div class="w-full h-[32%] flex flex-wrap">
+                                            <div class="w-[21%] h-full"></div>
+                                            <div class="w-[59%] h-full flex items-center justify-center">
+                                                <div class="w-full h-full flex items-center justify-center rounded-[50%] bg-[#D9D9D945]">
+                                                    <img src="./img/Car-icon.png" style="width: 1.7708vw; height: 1.0417vw;">
+                                                </div>
+                                            </div>
+                                            <div class="w-[20%] h-full"></div>
+                                        </div>
+                                        <div class="w-full h-[9%]"></div>
+                                        <div class="w-full h-[7%] flex items-center justify-center">
+                                            <span style="color: #000; text-align: center; font-family: regular; font-size: 1.0607vw; font-style: normal; font-weight: 600; line-height: 1.3544vw;">{{Language['car_credit']}}</span>
+                                        </div>
+                                        <div class="w-full h-[3%]"></div>
+                                        <div class="w-full h-[15%] flex items-center justify-center">
+                                            <span style="color: #595959; text-align: center; font-family: regular; font-size: .5835vw; font-style: normal; font-weight: 500; line-height: .5vw;">{{Language['car_credit_desc']}}</span>
+                                        </div>
+                                        <div class="w-full h-[11%]"></div>
+                                        <div class="w-full h-[10%] flex items-center justify-center">
+                                            <div class="w-[69%] h-full flex items-center justify-center bg-[#000000] rounded-[.2vw] hover:cursor-pointer" :class="{'bg-[#9E5EC7]': SelectCreditType == 'Car'}" @click="SelectCreditTypeFunction('Car')">
+                                                <span style="color: #FFF; text-align: center; font-family: regular; letter-spacing: .06vw; font-size: .5979vw; font-style: normal; font-weight: 600; line-height: .6358vw;">{{SelectCreditType == 'Car' ? 'Selected' : 'Select'}}</span>
+                                            </div>
+                                        </div>
+                                        <div class="w-full h-[8.5%]"></div>
+                                    </div>
+                                </div>
+                                <div class="w-[5%] h-full"></div>
+                                <div class="w-[25.5%] h-full flex items-center justify-center">  <!-- Credit Content - Open Credit -->
+                                    <div class="w-full h-full flex flex-col bg-[#F0ECF0] rounded-[.5vw]">
+                                        <div class="w-full h-[4.5%]"></div>
+                                        <div class="w-full h-[32%] flex flex-wrap">
+                                            <div class="w-[21%] h-full"></div>
+                                            <div class="w-[59%] h-full flex items-center justify-center">
+                                                <div class="w-full h-full flex items-center justify-center rounded-[50%] bg-[#D9D9D945]">
+                                                    <img src="./img/Withdraw-icon.png" style="width: 1.7708vw; height: 1.3542vw;">
+                                                </div>
+                                            </div>
+                                            <div class="w-[20%] h-full"></div>
+                                        </div>
+                                        <div class="w-full h-[9%]"></div>
+                                        <div class="w-full h-[7%] flex items-center justify-center">
+                                            <span style="color: #000; text-align: center; font-family: regular; font-size: 1.0607vw; font-style: normal; font-weight: 600; line-height: .9544vw;">{{Language['open_credit']}}</span>
+                                        </div>
+                                        <div class="w-full h-[3%]"></div>
+                                        <div class="w-full h-[15%] flex items-center justify-center">
+                                            <span style="color: #595959; text-align: center; font-family: regular; font-size: .5835vw; font-style: normal; font-weight: 500; line-height: .5vw;">{{Language['open_credit_desc']}}</span>
+                                        </div>
+                                        <div class="w-full h-[11%]"></div>
+                                        <div class="w-full h-[10%] flex items-center justify-center">
+                                            <div class="w-[69%] h-full flex items-center justify-center bg-[#000000] rounded-[.2vw] hover:cursor-pointer" :class="{'bg-[#9E5EC7]': SelectCreditType == 'Open'}" @click="SelectCreditTypeFunction('Open')">
+                                                <span style="color: #FFF; text-align: center; font-family: regular; letter-spacing: .06vw; font-size: .5979vw; font-style: normal; font-weight: 600; line-height: .6358vw;">{{SelectCreditType == 'Open' ? 'Selected' : 'Select'}}</span>
+                                            </div>
+                                        </div>
+                                        <div class="w-full h-[8.5%]"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="w-full h-[4.5%]" v-if="!ConfirmCredit"></div>
+                            <div class="w-full h-[2.7%] flex flex-wrap" v-if="!ConfirmCredit">  <!-- Credit Lower - Header -->
+                                <div class="w-[5%] h-full"></div>
+                                <div class="w-[40%] h-full flex items-center justify-start">
+                                    <span style="color: #000; text-align: center; font-family: regular; font-size: 1.3137vw; font-style: normal; font-weight: 600; line-height: 1.6774vw;">{{Language['home_credit']}}</span>
+                                </div>
+                                <div class="w-[55%] h-full"></div>
+                            </div>
+                            <div class="w-full h-[2%]" v-if="!ConfirmCredit"></div>
+                            <div class="w-full h-[6%] flex flex-wrap" v-if="!ConfirmCredit">  <!-- Credit Lower - Description -->
+                                <div class="w-[5%] h-full"></div>
+                                <div class="w-[80%] h-full flex items-center justify-start">
+                                    <span style="color: #222; font-family: regular; font-size: .7945vw; font-style: normal; font-weight: 600; line-height: .8145vw;">{{Language['credit_mini_desc']}}</span>
+                                </div>
+                                <div class="w-[15%] h-full"></div>
+                            </div>
+                            <div class="w-full h-[4%]"></div>
+                            <div class="w-full h-[32.1%] flex flex-wrap" v-if="!ConfirmCredit">
+                                <div class="w-[5%] h-full"></div>
+                                <div class="w-[84%] h-full block overflow-auto">  <!-- Credit Lower - v-for Function -->
+                                    <div class="w-full h-[30%] mb-[.6042vw] bg-[#F0ECF0] rounded-[.8333vw] flex flex-col" v-for="(data, k) in ShowAvailableCredits" :style="{height: SelectCredit == k ? '75%' : '30%'}">
+                                        <div class="w-full flex flex-wrap" :class="{'h-[40%]': SelectCredit == k, 'h-full': SelectCredit !== k}">
+                                            <div class="w-[5%] h-full"></div>
+                                            <div class="w-[16%] h-full flex items-center justify-center">
+                                                <div class="w-[80%] h-[80%] flex items-center justify-center rounded-[50%] bg-[#D9D9D975]">
+                                                    <img :src="GetSelectedCreditIMG(SelectCreditType)" :style="{width: SelectCreditType == 'Home' ? '1.4063vw' : SelectCreditType == 'Car' ? '1.7708vw' : SelectCreditType == 'Open' ? '1.7708vw' : '', height: SelectCreditType == 'Home' ? '1.4583vw' : SelectCreditType == 'Car' ? '1.0417vw' : SelectCreditType == 'Open' ? '1.3542vw' : ''}">
+                                                </div>
+                                            </div>
+                                            <div class="w-[3%] h-full"></div>
+                                            <div class="w-[35%] h-full flex flex-col">
+                                                <div class="w-full h-[15%]"></div>
+                                                <div class="w-full h-[35%] flex items-center justify-start">
+                                                    <span style="color: #000; text-align: center; font-family: regular; font-size: .8163vw; font-style: normal; font-weight: 600; line-height: 1.0423vw;">{{ data.label }}</span>
+                                                </div>
+                                                <div class="w-full h-[35%] flex items-center justify-start">
+                                                    <span style="color: #222; text-align: start; font-family: regular; font-size: .5297vw; font-style: normal; font-weight: 500; line-height: .6764vw;">{{ data.description }}</span>
+                                                </div>
+                                                <div class="w-full h-[15%]"></div>
+                                            </div>
+                                            <div class="w-[4%] h-full"></div>
+                                            <div class="w-[32%] h-full flex flex-col">
+                                                <div class="w-full h-[20%]"></div>
+                                                <div class="w-full h-[60%] flex flex-wrap">
+                                                    <div class="w-[50%] h-full flex items-center justify-start">
+                                                        <span style="color: #9E5EC7; text-align: center; font-family: regular; font-size: .7189vw; font-style: normal; font-weight: 600; line-height: .918vw;">{{ '$' + PE3D(data.price) }}</span>
+                                                    </div>
+                                                    <div class="w-[50%] h-full flex items-center justify-center">
+                                                        <div class="w-full h-[60%] flex items-center justify-center bg-[#9E5EC7] rounded-[.2vw] hover:cursor-pointer" v-if="SelectCredit != k" @click="SelectCreditFunction(k, data.price, data.requiredcreditpoint, data.paybacktime, data.paybackpercent, data.id)">
+                                                            <span class="w-full" style="color: #FFF; text-align: center; font-family: regular; font-size: .6054vw; font-style: normal; font-weight: 600; line-height: .773vw; letter-spacing: .03vw;">{{Language['select']}}</span>
+                                                        </div>
+                                                        <div class="w-full h-[60%] flex items-center justify-center bg-[#9E5EC7] rounded-[.2vw] hover:cursor-pointer" v-if="SelectCredit == k" @click="ConfirmCreditWithdraw()">
+                                                            <span class="w-full" style="color: #FFF; text-align: center; font-family: regular; font-size: .6054vw; font-style: normal; font-weight: 600; line-height: .773vw; letter-spacing: .03vw;">{{Language['confirm']}}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="w-full h-[20%]"></div>
+                                            </div>
+                                            <div class="w-[5%] h-full"></div>
+                                        </div>
+                                        <div class="w-full h-[60%] flex flex-col" v-if="SelectCredit == k">
+                                            <div class="w-full h-[8%]"></div>
+                                            <div class="w-full h-[70%] flex flex-wrap">
+                                                <div class="w-[5%] h-full"></div>
+                                                <div class="w-[90%] h-full bg-[#E7E2E7] rounded-[.25vw] flex flex-wrap">
+                                                    <div class="w-[6%] h-full"></div>
+                                                    <div class="w-[88%] h-full flex items-center justify-center">
+                                                        <div class="w-full h-[60%] flex flex-wrap">
+                                                            <div class="w-[50%] h-full flex items-center justify-center bg-[#D9D7D9] rounded-[.25vw]">
+                                                                <span style="color: #393939; text-align: center; font-family: regular; font-size: .773vw; font-style: normal; font-weight: 600; line-height: 1.1147vw;">{{data.paybacktime > 1 ? ''+data.paybacktime+' Weeks ' : ''+data.paybacktime+' Week '}} {{CalculateCreditPercent(data.paybackpercent)}} = <span style="color: #9E5EC7; text-align: center; font-family: regular; font-size: .773vw; font-style: normal; font-weight: 600; line-height: 1.1147vw;"> ${{ PE3D(data.price*data.paybackpercent) }}</span></span>
+                                                            </div>
+                                                            <div class="w-[50%] h-full flex items-center justify-start">
+                                                                <span style="color: #222; font-family: regular; font-size: .46vw; font-style: normal; font-weight: 400; line-height: .4851vw; margin-left: .5vw;">{{Language['credit_warning_text']}}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="w-[6%] h-full"></div>
+                                                </div>
+                                                <div class="w-[5%] h-full"></div>
+                                            </div>
+                                        </div>
+                                    </div>  
+                                </div>
+                                <div class="w-[11%] h-full"></div>
+                            </div>
+                        </div>
+                        <div class="w-full h-[7.5%]"></div>
+                    </div>
+                    <div class="w-[28%] h-full flex-col opening-animation" v-if="MiddleMenuSection == 'Credit' && ConfirmCredit">
+                        <div class="w-full h-[82.3%] opening-animation">  <!-- Credit Confirm - Screen -->
+                            <div class="w-full h-[30%] flex items-center justify-center">
+                                <img src="./img/Congrats-icon.png" style="width: 6.3542vw; height: 6.0938vw; margin-right: 1vw;">
+                            </div>
+                            <div class="w-full h-[25%] flex flex-col">
+                                <div class="w-full h-[50%] flex items-center justify-center">
+                                    <span style="color: #000; text-align: center; font-family: regular; font-size: 2.3069vw; font-style: normal; font-weight: 500; line-height: normal;">{{Language['withdrawed_money']}}</span>
+                                </div>
+                                <div class="w-full h-[50%] flex items-start justify-center">
+                                    <span style="color: #000; font-family: regular; font-size: 2.3069vw; font-style: normal; font-weight: 700; line-height: normal;">${{PE3D(SelectedCreditPrice)}}</span>
+                                </div>
+                            </div>
+                            <div class="w-full h-[15%] flex items-start justify-center">
+                                <div class="w-[50%] h-[90%] flex items-center justify-center rounded-[.4vw] border-[.15vw] border-[#B9B9B9] hover:cursor-pointer">
+                                    <div class="w-full h-[70%] flex items-center justify-center" @click="ClearAll()">
+                                        <img src="./img/House-icon.png" style="width: 1.4063vw; height: 1.4583vw;"> <span style="color: #171717; text-align: center; font-family: regular; font-size: 1.3501vw; font-style: normal; font-weight: 600; line-height: normal; margin-left: .5vw;">Back To Dashboard</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="w-[28%] h-full" v-if="MiddleMenuSection == 'Credit' && Debts > 0 && !ConfirmCredit">
+                        <div class="w-full h-[7%]"></div>
+                        <div class="w-full h-[12%] flex flex-wrap"> 
+                            <div class="w-[5.5%] h-full"></div>
+                            <div class="w-[77.5%] h-full flex flex-col">
+                                <div class="w-full h-[35%] flex items-center justify-center">
+                                    <h1 class="w-full send-money-text">{{Language['already_have_credit']}}</h1>
+                                </div>
+                                <div class="w-full h-[16%]"></div>
+                                <div class="w-full h-full flex items-center justify-start">
+                                    <span class="w-full credit-description">{{Language['active_credit_information_text']}}</span> 
+                                </div>
+                            </div>
+                            <div class="w-[17%] h-full"></div>
+                        </div>
+                        <div class="w-full h-[5%]"></div>
+                        <div class="w-full h-[10%] flex flex-col">
+                            <div class="w-full h-[25%] flex items-center justify-start">
+                                <span class="payback-text ml-[1.6vw]">{{ 'Active Credit Plan: ' + FindLabel(CurrentActiveCredit) }}</span>
+                            </div>
+                            <div class="w-full h-[25%] flex items-center justify-start">
+                                <span class="payback-text ml-[1.6vw]">{{ 'Pay Back: ' + PE3D(Debts) }}</span>
+                            </div>
+                            <div class="w-full h-[25%] flex items-center justify-start">
+                                <span class="payback-text ml-[1.6vw]">{{ 'Deadline for payment: ' + CreditLastDate }}</span>
+                            </div>
+                            <div class="w-full h-[25%]"></div>
+                        </div>
+                        <div class="w-full h-[15%]"></div>
+                        <div class="w-full h-[25%] flex items-center justify-center">
+                            <div class="w-[88%] h-[80%] flex items-center justify-start">
+                                <span class="w-full h-full payback-text">
+                                    {{Language['general_information']}}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="w-full h-[26%]"></div>
+                    </div>
+                    <div class="w-[52%] h-full flex flex-col">  <!-- Right menu -->
+                        <div class="w-full h-[7%]"></div>
+                        <div class="w-full h-[3.5%] flex flex-wrap">  <!-- Headers -->
+                            <div class="w-[10.5%] h-full"></div>
+                            <div class="w-[20%] h-full flex items-center justify-start">
+                                <span style="color: #000; text-align: center; font-family: regular; font-size: 1.3063vw; font-style: normal; font-weight: 600; line-height: 1.668vw;">{{Language['personal_balance']}}</span>
+                            </div>
+                            <div class="w-[18%] h-full"></div>
+                            <div class="w-[12%] h-full flex items-center justify-start" v-if="Logintype != 'hacker' || CreditSystem != false">
+                                <span style="color: #000; font-family: regular; font-size: 1.3063vw; font-style: normal; font-weight: 600; line-height: 1.668vw;">{{Language['debts']}}</span>
+                            </div>
+                            <div class="w-[12%] h-full"></div>
+                            <div class="w-[15%] h-full flex items-center justify-start" v-if="Logintype != 'hacker' || CreditSystem != false">
+                                <span style="color: #000; font-family: regular; font-size: 1.3063vw; font-style: normal; font-weight: 600; line-height: 1.668vw;">{{Language['credit_point']}}</span>
+                            </div>
+                            <div class="w-[12.5%] h-full"></div>
+                        </div>
+                        <div class="w-full h-[2%]"></div>
+                        <div class="w-full h-[5%] flex flex-wrap">  <!-- Personal Details -->
+                            <div class="w-[10%] h-full"></div>
+                            <div class="w-[30%] h-full flex items-center justify-start">
+                                <span class="w-full" style="color: #000; font-family: regular; font-size: 2.5548vw; font-style: normal; font-weight: 600; line-height: normal;">{{ '$' + PE3D(PlayersMoney) }}</span>
+                            </div>
+                            <div class="w-[5%] h-full"></div>
+                            <div class="w-[19.5%] h-full flex items-center justify-start" :class="{ 'justify-start': Debts > 0, 'justify-center': Debts <= 0, 'ml-[-1.7vw]': Debts <= 0}" v-if="Logintype != 'hacker' || CreditSystem != false">
+                                <span style="color: #000; text-align: center; font-family: regular; font-size: 2.1548vw; font-style: normal; font-weight: 600; line-height: 4.0283vw;">{{ DebtsCurrency(Debts) }}</span>
+                                <div class="w-[35%] h-[70%] flex items-center justify-center hover:cursor-pointer bg-[#000]" style="margin-left: 1vw;" @click="PayDebts()" v-if="Debts > 0">
+                                    <span class="w-full" style="color: white; text-align: center; font-family: regular; font-size: .7257vw; font-style: normal; font-weight: 600; line-height: normal;">{{Language['pay']}}</span>
+                                </div>
+                            </div>
+                            <div class="w-[8%] h-full"></div>
+                            <div class="w-[20%] h-full flex items-center justify-start" v-if="Logintype != 'hacker' || CreditSystem != false">
+                                <span :class="{'ml-[1.7vw]': Debts <= 0}" style="color: #000; text-align: center; font-family: regular; font-size: 2.1548vw; font-style: normal; font-weight: 600; line-height: 4.0283vw;">{{ PE3D(PlayersCreditPoint) }}</span> <img src="./img/Star-icon.png" style="width: 1.8229vw; height: 1.8229vw; margin-left: .5vw;">
+                            </div>
+                            <div class="w-[7.5%] h-full"></div>
+                        </div>
+                        <div class="w-full h-[2%]"></div>
+                        <div class="w-full h-[3.5%] flex flex-wrap ">  <!-- Monthly/Yearly - Button Container -->
+                            <div class="w-[10%] h-full"></div>
+                            <div class="w-[9%] h-full flex items-center justify-center">
+                                <div class="w-full h-full flex items-center justify-center bg-[#D9D9D9] rounded-[.2vw] hover:cursor-pointer">
+                                    <span style="color: #4A4A4A; text-align: center; font-family: regular; font-size: .8645vw; font-style: normal; font-weight: 600; line-height: normal;">{{Language['monthly']}}</span>
+                                </div>
+                            </div>
+                            <div class="w-[81%] h-full"></div>
+                        </div>
+                        <div class="w-full h-[1%]"></div>
+                        <div class="w-full h-[40%] flex items-center justify-center">  <!-- Monthly/Yearly - ChartJs -->
+                            <div class="w-full h-full flex items-center justify-center">
+                                <canvas id="chart"></canvas>
+                            </div>
+                        </div>
+                        <div class="w-full h-[32%] flex flex-wrap">  <!-- Last Transactions -->
+                            <div class="w-[10%] h-full"></div>
+                            <div class="w-[80%] h-full flex flex-col">
+                                <div class="w-full h-[4%]"></div>
+                                <div class="w-full h-[9%] flex items-start justify-start">
+                                    <span style="color: #000; font-family: regular; font-size: 1.3061vw; font-style: normal; font-weight: 600; line-height: normal; margin-top: -.4vw;">{{Language['last_transactions']}}</span>
+                                </div>
+                                <div class="w-full h-[5%]"></div>
+                                <div class="w-full h-[82%] block overflow-y-auto overflow-x-hidden">
+                                    <div class="w-full h-[35%] flex flex-wrap mb-[1vw]" v-for="data in LastTransactions.slice().reverse()">
+                                        <div class="w-[10%] h-full flex items-center justify-center">
+                                            <div class="w-full h-full flex items-center justify-center">
+                                                <img class="rounded-[50%]" :src="data.pp" style="width: 3.3333vw; height: 3.3333vw;">
+                                            </div>
+                                        </div>
+                                        <div class="w-[3%] h-full"></div>
+                                        <div class="w-[15%] h-full flex flex-col">
+                                            <div class="w-full h-[50%] flex flex-wrap items-end justify-start"> 
+                                                <span class="w-full" style="color: #000; text-align: start; font-family: regular; font-size: 1.0184vw; font-style: normal; font-weight: 600; line-height: normal;">{{ data.name }}</span>
+                                            </div>
+                                            <div class="w-full h-[50%] flex items-start justify-start">
+                                                <span class="w-full h-full" style="color: #424242; text-align: start; font-family: regular; font-size: .7188vw; font-style: normal; font-weight: 500; line-height: normal;" v-if="data.type == 'Transfer'">Send To: {{ data.sendedto }}</span>
+                                                <span class="w-full h-full" style="color: #424242; text-align: start; font-family: regular; font-size: .7188vw; font-style: normal; font-weight: 500; line-height: normal;" v-if="data.type == 'Received'">From: {{ data.received }}</span>
+                                                <span class="w-full h-full" style="color: #424242; text-align: start; font-family: regular; font-size: .7188vw; font-style: normal; font-weight: 500; line-height: normal;" v-if="data.type == 'Withdraw'">{{Language['withdrawed']}}</span>
+                                                <span class="w-full h-full" style="color: #424242; text-align: start; font-family: regular; font-size: .7188vw; font-style: normal; font-weight: 500; line-height: normal;" v-if="data.type == 'Deposit'">{{Language['deposited']}}</span>
+                                                <span class="w-full h-full" style="color: #424242; text-align: start; font-family: regular; font-size: .7188vw; font-style: normal; font-weight: 500; line-height: normal;" v-if="data.type == 'Shopping'">{{Language['shopping']}}</span>
+                                            </div>
+                                        </div>
+                                        <div class="w-[6%] h-full"></div>
+                                        <div class="w-[13%] h-full flex items-center justify-center">
+                                            <span class="w-full" style="color: #000; text-align: center; font-family: regular; font-size: 1.1257vw; font-style: normal; font-weight: 600; line-height: normal;">{{ data.date }}</span>
+                                        </div>
+                                        <div class="w-[6%] h-full"></div>
+                                        <div class="w-[18%] h-full flex items-center justify-center">
+                                            <span class="w-full" style="color: #000; text-align: center; font-family: regular; font-size: 1.1257vw; font-style: normal; font-weight: 600; line-height: normal;">{{ data.type }}</span>
+                                        </div>
+                                        <div class="w-[6%] h-full"></div>
+                                        <div class="w-[23%] h-full flex flex-wrap">
+                                            <div class="w-[50%] h-full flex items-center justify-center">
+                                                <span class="w-full" style="color: #000; text-align: center; font-family: regular; font-size: 1.0257vw; font-style: normal; font-weight: 600; line-height: normal;" :style="FontSize">{{ '$' + PE3D(data.amount) }}</span>
+                                            </div>
+                                            <div class="w-[50%] h-full flex items-center justify-start">
+                                                <img src="./img/WD-icon.png" style="width: .8333vw; height: .7292vw; margin-left: .5vw;" :style="{'margin-left': data.amount.toString().length >= 8 ? '1vw' : '.5vw'}" :class="{'scale-x-[-1]': data.type == 'Deposit' || data.type == 'Received'}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="w-[10%] h-full"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <transition name="notify-slide">
+                <div class="notify-class" :style="{ backgroundColor: NotifyBGColor }" v-if="NotifyActive">
+                    <span class="notify-text">{{ NotifyText }}</span>
+                </div>
+            </transition>
+        </div>
+    </div>
+    <script src="./app.js"></script>
+</body>
+<script src="https://code.jquery.com/jquery-3.5.0.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+</html>
