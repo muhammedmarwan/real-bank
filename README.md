@@ -1,4 +1,5 @@
 # Bank system for FiveM
+- ⛔⛔⛔ ORIGINAL CREATOR https://github.com/Oph3Z1/real-bank
 
 ## Video
 ### [YouTube](https://www.youtube.com/watch?v=XpsgESXfZqg)
