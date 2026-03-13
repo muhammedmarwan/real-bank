@@ -95,7 +95,8 @@ end)
 
 function OpenATM()
     SendNUIMessage({
-        action = 'OpenATM'
+        action = 'OpenATM',
+        isATM = true
     })
     SetNuiFocus(true, true)
 end
@@ -151,9 +152,6 @@ AddEventHandler('real-bank:OpenNormalBank', function()
     TriggerServerEvent('real-bank:CheckAccountExistens', nil)
 end)
 
-RegisterCommand('realbank', function()
-    TriggerServerEvent('real-bank:CheckAccountExistens', nil)
-end, false)
 
 RegisterNetEvent('real-bank:UpdateUITransaction')
 AddEventHandler('real-bank:UpdateUITransaction', function()

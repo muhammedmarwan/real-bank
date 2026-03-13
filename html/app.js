@@ -83,6 +83,7 @@ const app = Vue.createApp({
         CreditSystem: true,
         HackedAccountWithdrawLimit: 0,
         HackedAccountUsage: 0,
+        isATM: false,
         AvailableCredits: [
             { id: 1, type: 'Home', label: 'Normal Home Credit', description: 'This is a normal loan and the amount is low', price: 100000, requiredcreditpoint: 300, paybacktime: 1, paybackpercent: 1.2 }, // paybackpercent --> 1 = 100%, 2 = 200%   ∥    paybacktime --> weeks          
             { id: 2, type: 'Home', label: 'Premium Home Credit', description: 'This is a premium loan and the amount is high', price: 1000000, requiredcreditpoint: 600, paybacktime: 2, paybackpercent: 1.4 }, // paybackpercent --> 1 = 100%, 2 = 200%   ∥    paybacktime --> weeks  
@@ -403,6 +404,7 @@ const app = Vue.createApp({
             this.transferInput = ''
             this.chartData = null
             this.GetChart = null
+            this.isATM = false
         },
 
         DWAction() {
@@ -807,6 +809,7 @@ const app = Vue.createApp({
                 this.show = true
                 this.CurrentScreen = 'Password'
                 this.PasswordScreenType = 'Normal'
+                this.isATM = data.isATM === true
             }
 
             if (data.action == 'CloseBankUI') {
