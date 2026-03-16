@@ -8,6 +8,10 @@ local function BuildQboxFallbackObject()
             return exports.qbx_core:GetPlayer(source)
         end
 
+        object.Functions.GetPlayerByCitizenId = function(citizenid)
+            return exports.qbx_core:GetPlayerByCitizenId(citizenid)
+        end
+
         object.Functions.GetSource = function(citizenid)
             local target = exports.qbx_core:GetPlayerByCitizenId(citizenid)
             return target and target.PlayerData and target.PlayerData.source or 0

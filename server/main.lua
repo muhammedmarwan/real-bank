@@ -838,18 +838,69 @@ function ExecuteSql(query)
     return result
 end
 
-RegisterCallback("real-bank:GetSocietyMoney", function(source, cb, society)
+-- Society Account Exports
+function GetSocietyMoney(society)
     local amount = 0
-    local status = pcall(function()
-        amount = exports['qbx_management']:GetAccount(society)
-    end)
-    if not status then 
-        local status2 = pcall(function()
-            amount = exports['qb-management']:GetAccount(society)
+    if GetResourceState('qb-management') == 'started' then
+        amount = exports['qb-management']:GetAccount(society)
+    elseif GetResourceState('ox_inventory') == 'started' then
+        local account = exports.ox_inventory:GetAccount('society_'..society)
+        amount = account and account.balance or 0
+    elseif GetResourceState('qbx_management') == 'started' then
+        pcall(function()
+            amount = exports['qbx_management']:GetAccount(society)
         end)
-        if not status2 then cb(false) return end
     end
-    cb(amount or 0)
+    return amount or 0
+end
+
+exports('getAccountMoney', GetSocietyMoney)
+exports('GetBalance', GetSocietyMoney) -- Alias
+
+exports('addAccountMoney', function(society, amount)
+    if GetResourceState('qb-management') == 'started' then
+        exports['qb-management']:AddMoney(society, amount)
+    elseif GetResourceState('qbx_management') == 'started' then
+        pcall(function()
+            exports['qbx_management']:AddMoney(society, amount)
+        end)
+    elseif GetResourceState('ox_inventory') == 'started' then
+        exports.ox_inventory:AdjustAccountBalance('society_'..society, amount)
+    end
+end)
+
+exports('removeAccountMoney', function(society, amount)
+    if GetResourceState('qb-management') == 'started' then
+        exports['qb-management']:RemoveMoney(society, amount)
+    elseif GetResourceState('qbx_management') == 'started' then
+        pcall(function()
+            exports['qbx_management']:RemoveMoney(society, amount)
+        end)
+    elseif GetResourceState('ox_inventory') == 'started' then
+        exports.ox_inventory:AdjustAccountBalance('society_'..society, -amount)
+    end
+end)
+
+-- Player Money Exports
+exports('AddMoney', function(target, type, amount, reason)
+    local Player = type(target) == 'number' and frameworkObject.Functions.GetPlayer(target) or frameworkObject.Functions.GetPlayerByCitizenId(target)
+    if Player then
+        return Player.Functions.AddMoney(type, amount, reason)
+    end
+    return false
+end)
+
+exports('RemoveMoney', function(target, type, amount, reason)
+    local Player = type(target) == 'number' and frameworkObject.Functions.GetPlayer(target) or frameworkObject.Functions.GetPlayerByCitizenId(target)
+    if Player then
+        return Player.Functions.RemoveMoney(type, amount, reason)
+    end
+    return false
+end)
+
+-- Boss Menu compatibility
+RegisterCallback("real-bank:GetSocietyMoney", function(source, cb, society)
+    cb(GetSocietyMoney(society))
 end)
 
 RegisterNetEvent('real-bank:DepositSociety', function(society, amount)
@@ -864,10 +915,14 @@ RegisterNetEvent('real-bank:DepositSociety', function(society, amount)
 
     if Player.PlayerData.money.bank >= payment then
         Player.Functions.RemoveMoney('bank', payment)
-        if GetResourceState('qbx_management') == 'started' then
-            exports['qbx_management']:AddMoney(society, payment)
-        elseif GetResourceState('qb-management') == 'started' then
+        if GetResourceState('qb-management') == 'started' then
             exports['qb-management']:AddMoney(society, payment)
+        elseif GetResourceState('ox_inventory') == 'started' then
+            exports.ox_inventory:AddAccountMoney('society_'..society, payment)
+        elseif GetResourceState('qbx_management') == 'started' then
+            pcall(function()
+                exports['qbx_management']:AddMoney(society, payment)
+            end)
         end
         Config.Notification(Config.Language['successfully_deposited'] or 'Successfully deposited', 'success', true, src)
     else
@@ -885,18 +940,17 @@ RegisterNetEvent('real-bank:WithdrawSociety', function(society, amount)
     if (Player.PlayerData.job.name ~= society and Player.PlayerData.gang.name ~= society) then return end
     if (not Player.PlayerData.job.isboss and not Player.PlayerData.gang.isboss) then return end
 
-    local accMoney = 0
-    if GetResourceState('qbx_management') == 'started' then
-        accMoney = exports['qbx_management']:GetAccount(society)
-    elseif GetResourceState('qb-management') == 'started' then
-        accMoney = exports['qb-management']:GetAccount(society)
-    end
+    local accMoney = GetSocietyMoney(society)
 
     if accMoney and accMoney >= payment then
-        if GetResourceState('qbx_management') == 'started' then
-            exports['qbx_management']:RemoveMoney(society, payment)
-        elseif GetResourceState('qb-management') == 'started' then
+        if GetResourceState('qb-management') == 'started' then
             exports['qb-management']:RemoveMoney(society, payment)
+        elseif GetResourceState('ox_inventory') == 'started' then
+            exports.ox_inventory:RemoveAccountMoney('society_'..society, payment)
+        elseif GetResourceState('qbx_management') == 'started' then
+            pcall(function()
+                exports['qbx_management']:RemoveMoney(society, payment)
+            end)
         end
         Player.Functions.AddMoney('bank', payment)
         Config.Notification(Config.Language['successfylly_withdrawed'] or 'Successfully withdrawed', 'success', true, src)
@@ -904,3 +958,4 @@ RegisterNetEvent('real-bank:WithdrawSociety', function(society, amount)
         Config.Notification('Society does not have enough money', 'error', true, src)
     end
 end)
+
