@@ -47,10 +47,15 @@ function GetDiscordAvatar(user)
                     end
                 end
             end
-            Caches.Avatars[discordId] = imgURL
+            Caches.Avatars[discordId] = imgURL or "https://cdn.discordapp.com/embed/avatars/0.png"
         else
             imgURL = Caches.Avatars[discordId]
         end
     end
+    
+    if imgURL == nil then
+        imgURL = "https://cdn.discordapp.com/embed/avatars/0.png"
+    end
+    
     return imgURL
 end

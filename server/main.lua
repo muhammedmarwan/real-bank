@@ -47,9 +47,9 @@ Citizen.CreateThread(function()
         local PlayerMoney = GetPlayerMoneyOnline("bank", src)
         local PlayersCash = GetPlayerMoneyOnline("cash", src)
         local dcpfp = GetDiscordAvatar(src)
-        local data = ExecuteSql("SELECT * FROM `real_bank` WHERE `identifier` = '"..PlayerIdent.."'")
+        local data = ExecuteSql("SELECT * FROM `real_bank` WHERE `identifier` = '" .. PlayerIdent .. "'")
         local transferplayersdata = GetPlayers()
-        
+
         local currenttime = GetCurrentDate()
 
         if #data > 0 then
@@ -72,7 +72,9 @@ Citizen.CreateThread(function()
                                         data[1].credit = b
                                         if tostring(a.playerpfp) ~= tostring(dcpfp) then
                                             a.playerpfp = dcpfp
-                                            ExecuteSql("UPDATE `real_bank` SET `info` = '"..json.encode(data[1].info).."' WHERE `identifier` = '"..PlayerIdent.."' ")
+                                            ExecuteSql("UPDATE `real_bank` SET `info` = '" ..
+                                            json.encode(data[1].info) .. "' WHERE `identifier` = '" .. PlayerIdent ..
+                                            "' ")
                                         end
                                         DataTable = {
                                             data = data,
@@ -89,7 +91,8 @@ Citizen.CreateThread(function()
                                     data[1].credit = b
                                     if tostring(a.playerpfp) ~= tostring(dcpfp) then
                                         a.playerpfp = dcpfp
-                                        ExecuteSql("UPDATE `real_bank` SET `info` = '"..json.encode(data[1].info).."' WHERE `identifier` = '"..PlayerIdent.."' ")
+                                        ExecuteSql("UPDATE `real_bank` SET `info` = '" ..
+                                        json.encode(data[1].info) .. "' WHERE `identifier` = '" .. PlayerIdent .. "' ")
                                     end
                                     DataTable = {
                                         data = data,
@@ -107,7 +110,8 @@ Citizen.CreateThread(function()
                             data[1].credit = b
                             if tostring(a.playerpfp) ~= tostring(dcpfp) then
                                 a.playerpfp = dcpfp
-                                ExecuteSql("UPDATE `real_bank` SET `info` = '"..json.encode(data[1].info).."' WHERE `identifier` = '"..PlayerIdent.."' ")
+                                ExecuteSql("UPDATE `real_bank` SET `info` = '" ..
+                                json.encode(data[1].info) .. "' WHERE `identifier` = '" .. PlayerIdent .. "' ")
                             end
                             DataTable = {
                                 data = data,
@@ -122,12 +126,13 @@ Citizen.CreateThread(function()
                         local b = json.decode(data[1].credit)
                         data[1].info = a
                         data[1].credit = b
-        
+
                         if tostring(a.playerpfp) ~= tostring(dcpfp) then
                             a.playerpfp = dcpfp
-                            ExecuteSql("UPDATE `real_bank` SET `info` = '"..json.encode(data[1].info).."' WHERE `identifier` = '"..PlayerIdent.."' ")
+                            ExecuteSql("UPDATE `real_bank` SET `info` = '" ..
+                            json.encode(data[1].info) .. "' WHERE `identifier` = '" .. PlayerIdent .. "' ")
                         end
-        
+
                         DataTable = {
                             data = data,
                             PlayerMoney = tonumber(PlayerMoney),
@@ -148,7 +153,7 @@ Citizen.CreateThread(function()
     RegisterCallback("real-bank:GetBills", function(source, cb)
         local src = source
         local identity = GetIdentifier(src)
-        local data = ExecuteSql("SELECT * FROM `phone_invoices` WHERE `citizenid` = '"..identity.."'")
+        local data = ExecuteSql("SELECT * FROM `phone_invoices` WHERE `citizenid` = '" .. identity .. "'")
         if next(data) then
             cb(data)
         else
@@ -159,7 +164,7 @@ Citizen.CreateThread(function()
     frameworkObject.Functions.CreateCallback("real-bank:ATMLoginAnotherAccount", function(source, cb, getdata)
         local src = source
         local targetiban = getdata.iban
-        local data = ExecuteSql("SELECT * FROM `real_bank` WHERE `iban` = '"..targetiban.."'")
+        local data = ExecuteSql("SELECT * FROM `real_bank` WHERE `iban` = '" .. targetiban .. "'")
         if data and data[1] then
             local targetidentity = data[1].identifier
             local targetinfo = json.decode(data[1].info)
@@ -179,7 +184,8 @@ Citizen.CreateThread(function()
                     }
                     cb(DataTable)
                     accountusedtable.loginlimit = accountusedtable.loginlimit - 1
-                    ExecuteSql("UPDATE `real_bank` SET `AccountUsed` = '"..json.encode(accountusedtable).."' WHERE `identifier` = '"..targetidentity.."'")
+                    ExecuteSql("UPDATE `real_bank` SET `AccountUsed` = '" ..
+                    json.encode(accountusedtable) .. "' WHERE `identifier` = '" .. targetidentity .. "'")
                 else
                     Config.Notification(Config.Language['cant_hack_anymore'], 'error', true, src)
                 end
@@ -236,7 +242,8 @@ RegisterNetEvent("real-bank:CreateAccount", function(password)
         }
     }
 
-    local insertQuery = ("INSERT INTO `real_bank` (`identifier`, `info`, `credit`, `transaction`, `iban`, `password`, `AccountUsed`) VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s')"):format(
+    local insertQuery = ("INSERT INTO `real_bank` (`identifier`, `info`, `credit`, `transaction`, `iban`, `password`, `AccountUsed`) VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s')")
+    :format(
         SqlEscape(CreateAccount.identifier),
         SqlEscape(json.encode(CreateAccount.info)),
         SqlEscape(json.encode(CreateAccount.credit)),
@@ -256,7 +263,7 @@ end)
 RegisterNetEvent('real-bank:ATMLoginOwnAccount', function(password)
     local src = source
     local PlayerIdent = GetIdentifier(src)
-    local data = ExecuteSql("SELECT `password` FROM `real_bank` WHERE `identifier` = '"..PlayerIdent.."'")
+    local data = ExecuteSql("SELECT `password` FROM `real_bank` WHERE `identifier` = '" .. PlayerIdent .. "'")
     if data[1] then
         if tonumber(password) == tonumber(data[1].password) then
             TriggerClientEvent('real-bank:OpenBank', src)
@@ -269,7 +276,7 @@ end)
 RegisterNetEvent('real-bank:ChangePassword', function(newpassword)
     local ident = GetIdentifier(source)
     local data = ExecuteSql("SELECT `identifier` FROM `real_bank` WHERE `identifier` = '" .. ident .. "'")
-    
+
     if data[1] then
         ExecuteSql("UPDATE `real_bank` SET `password` = '" .. newpassword .. "' WHERE `identifier` = '" .. ident .. "'")
     else
@@ -292,7 +299,7 @@ RegisterNetEvent('real-bank:CheckAccountExistens', function(data)
         else
             TriggerClientEvent('real-bank:CheckAccountExistensResult', src, true, nil)
         end
-    else 
+    else
         if data then
             TriggerClientEvent('real-bank:CheckAccountExistensResult', src, false, data)
         else
@@ -304,7 +311,7 @@ end)
 RegisterNetEvent('real-bank:CreditConfirm', function(data)
     local src = source
     local ident = GetIdentifier(src)
-    local sqldata = ExecuteSql("SELECT `credit` FROM `real_bank` WHERE `identifier` = '"..ident.."'")
+    local sqldata = ExecuteSql("SELECT `credit` FROM `real_bank` WHERE `identifier` = '" .. ident .. "'")
     local a = json.decode(sqldata[1].credit)
     if a.credid == '' or a.cerdid == "" or a.credid == nil then
         if Config.RequireCreditPoint then
@@ -312,11 +319,12 @@ RegisterNetEvent('real-bank:CreditConfirm', function(data)
                 a.playercreditpoint = a.playercreditpoint - data.credreq
                 NewCreditTable = {
                     playercreditpoint = a.playercreditpoint,
-                    debt = data.credprice*data.credpaybackpercent,
+                    debt = data.credprice * data.credpaybackpercent,
                     activecredit = data.credid,
                     creditlastdate = os.date('%d.%m.%Y', os.time() + tonumber(data.creddate) * 7 * 24 * 60 * 60)
                 }
-                ExecuteSql("UPDATE `real_bank` SET `credit` = '"..json.encode(NewCreditTable).."' WHERE `identifier` = '"..ident.."'")
+                ExecuteSql("UPDATE `real_bank` SET `credit` = '" ..
+                json.encode(NewCreditTable) .. "' WHERE `identifier` = '" .. ident .. "'")
                 RemoveAddBankMoneyOnline('add', tonumber(data.credprice), src)
             else
                 Config.Notification(Config.Language['not_enough_cp'], 'error', true, src)
@@ -325,11 +333,12 @@ RegisterNetEvent('real-bank:CreditConfirm', function(data)
             a.playercreditpoint = a.playercreditpoint - data.credreq
             NewCreditTable = {
                 playercreditpoint = a.playercreditpoint,
-                debt = data.credprice*data.credpaybackpercent,
+                debt = data.credprice * data.credpaybackpercent,
                 activecredit = data.credid,
                 creditlastdate = os.date('%d.%m.%Y', os.time() + tonumber(data.creddate) * 7 * 24 * 60 * 60)
             }
-            ExecuteSql("UPDATE `real_bank` SET `credit` = '"..json.encode(NewCreditTable).."' WHERE `identifier` = '"..ident.."'")
+            ExecuteSql("UPDATE `real_bank` SET `credit` = '" ..
+            json.encode(NewCreditTable) .. "' WHERE `identifier` = '" .. ident .. "'")
             RemoveAddBankMoneyOnline('add', tonumber(data.credprice), src)
         end
     else
@@ -339,18 +348,19 @@ end)
 
 RegisterNetEvent('real-bank:PayCreditDebts', function()
     local ident = GetIdentifier(PlayerSource)
-    local data = ExecuteSql("SELECT `credit` FROM `real_bank` WHERE `identifier` = '"..ident.."'")
+    local data = ExecuteSql("SELECT `credit` FROM `real_bank` WHERE `identifier` = '" .. ident .. "'")
     local GetPlayerMoney = GetPlayerMoneyOnline('bank', PlayerSource)
     local a = json.decode(data[1].credit)
     if a.debt > 0 then
         if GetPlayerMoney > tonumber(a.debt) then
             NewCreditTable = {
-                playercreditpoint =  a.playercreditpoint,
+                playercreditpoint = a.playercreditpoint,
                 activecredit = '',
                 creditlastdate = 0,
                 debt = 0,
             }
-            ExecuteSql("UPDATE `real_bank` SET `credit` = '"..json.encode(NewCreditTable).."' WHERE `identifier` = '"..ident.."'")
+            ExecuteSql("UPDATE `real_bank` SET `credit` = '" ..
+            json.encode(NewCreditTable) .. "' WHERE `identifier` = '" .. ident .. "'")
             RemoveAddBankMoneyOnline('remove', tonumber(a.debt), PlayerSource)
             StatusThing = true
         else
@@ -371,7 +381,7 @@ RegisterNetEvent('real-bank:PayBills', function(id, amount)
 
     if Player.PlayerData.money.bank >= payment then
         Player.Functions.RemoveMoney('bank', payment)
-        ExecuteSql("DELETE FROM `phone_invoices` WHERE `id` = '"..id.."'")
+        ExecuteSql("DELETE FROM `phone_invoices` WHERE `id` = '" .. id .. "'")
         TriggerClientEvent('real-bank:RefreshBillsUI', src)
     else
         Config.Notification(Config.Language['no_money_to_pay_bills'], 'error', true, src)
@@ -453,7 +463,7 @@ end)
 RegisterNetEvent('real-bank:WithdrawHackedAccount', function(getdata)
     local src = source
     local targetiban = getdata.iban
-    local data = ExecuteSql("SELECT * FROM `real_bank` WHERE `iban` = '"..targetiban.."'")
+    local data = ExecuteSql("SELECT * FROM `real_bank` WHERE `iban` = '" .. targetiban .. "'")
     if data and data[1] then
         local targetidentity = data[1].identifier
         local accountusedtable = json.decode(data[1].AccountUsed)
@@ -466,7 +476,8 @@ RegisterNetEvent('real-bank:WithdrawHackedAccount', function(getdata)
                     local Player = frameworkObject.Functions.GetPlayer(src)
                     Player.Functions.AddMoney("cash", amountToWithdraw)
                     accountusedtable.withdrawlimit = accountusedtable.withdrawlimit - amountToWithdraw
-                    ExecuteSql("UPDATE `real_bank` SET `AccountUsed` = '"..json.encode(accountusedtable).."' WHERE `identifier` = '"..targetidentity.."'")
+                    ExecuteSql("UPDATE `real_bank` SET `AccountUsed` = '" ..
+                    json.encode(accountusedtable) .. "' WHERE `identifier` = '" .. targetidentity .. "'")
                 else
                     Config.Notification("You cannot withdraw that much from this hacked account", 'error', true, src)
                 end
@@ -487,7 +498,7 @@ RegisterNetEvent('real-bank:TransferMoney', function(iban, amount)
         return
     end
 
-    local data = ExecuteSql("SELECT * FROM `real_bank` WHERE `iban` = '"..iban.."'")
+    local data = ExecuteSql("SELECT * FROM `real_bank` WHERE `iban` = '" .. iban .. "'")
 
     for _, v in pairs(data) do
         if tonumber(v.iban) == tonumber(iban) then
@@ -510,13 +521,15 @@ RegisterNetEvent('real-bank:TransferMoney', function(iban, amount)
                         SendLog(targetplayersource, senderplayername, nil, 'Received', transferAmount, 'discord')
                     end
                 else
-                    local getplayersname = ExecuteSql("SELECT `charinfo` FROM `players` WHERE `citizenid` = '"..v.identifier.."'")
+                    local getplayersname = ExecuteSql("SELECT `charinfo` FROM `players` WHERE `citizenid` = '" ..
+                    v.identifier .. "'")
                     local b = json.decode(getplayersname[1].charinfo)
                     local targetName = b.firstname .. " " .. b.lastname
                     Player.Functions.RemoveMoney('bank', transferAmount)
                     AddBankMoneyOffline(v.identifier, transferAmount)
                     SendLog(src, nil, targetName, 'Transfer', transferAmount, 'discord')
-                    SendOfflineLog(src, v.identifier, targetName, senderplayername, nil, 'Received', transferAmount, 'discord')
+                    SendOfflineLog(src, v.identifier, targetName, senderplayername, nil, 'Received', transferAmount,
+                        'discord')
                 end
             else
                 Config.Notification(Config.Language['transfer_no_money'], 'error', true, src)
@@ -562,14 +575,14 @@ end
 
 function AccountExists(identifier)
     local ident = SqlEscape(identifier)
-    local result = ExecuteSql("SELECT `identifier` FROM `real_bank` WHERE `identifier` = '"..ident.."' LIMIT 1")
+    local result = ExecuteSql("SELECT `identifier` FROM `real_bank` WHERE `identifier` = '" .. ident .. "' LIMIT 1")
     return result and result[1] ~= nil
 end
 
 function GenerateUniqueIBAN()
     for _ = 1, 100 do
         local candidate = math.random(1000, 9999)
-        local result = ExecuteSql("SELECT `iban` FROM `real_bank` WHERE `iban` = '"..candidate.."' LIMIT 1")
+        local result = ExecuteSql("SELECT `iban` FROM `real_bank` WHERE `iban` = '" .. candidate .. "' LIMIT 1")
         if not result or not result[1] then
             return candidate
         end
@@ -588,37 +601,37 @@ function GetPlayerAccount(identifier)
     return false
 end
 
-function RegisterCallback(name, cbFunc, data)
+function RegisterCallback(name, cbFunc)
     while not frameworkObject do
         Citizen.Wait(0)
     end
 
     frameworkObject.Functions.CreateCallback(
         name,
-        function(source, cb, data)
-            cbFunc(source, cb)
+        function(source, cb, ...)
+            cbFunc(source, cb, ...)
         end
     )
 end
 
 function GetPlayerMoneyOffline(identifier)
-    local result = ExecuteSql("SELECT money FROM players WHERE citizenid = '"..identifier.."'")
+    local result = ExecuteSql("SELECT money FROM players WHERE citizenid = '" .. identifier .. "'")
     local targetMoney = json.decode(result[1].money)
     return targetMoney.bank
 end
 
 function RemoveBankMoneyOffline(identifier, payment)
-    local result = ExecuteSql("SELECT money FROM players WHERE citizenid = '"..identifier.."'")
+    local result = ExecuteSql("SELECT money FROM players WHERE citizenid = '" .. identifier .. "'")
     local targetMoney = json.decode(result[1].money)
     targetMoney.bank = targetMoney.bank - payment
-    ExecuteSql("UPDATE players SET money = '"..json.encode(targetMoney).."' WHERE citizenid = '"..identifier.."'")
+    ExecuteSql("UPDATE players SET money = '" .. json.encode(targetMoney) .. "' WHERE citizenid = '" .. identifier .. "'")
 end
 
 function AddBankMoneyOffline(identifier, payment)
-    local result = ExecuteSql("SELECT money FROM players WHERE citizenid = '"..identifier.."'")
+    local result = ExecuteSql("SELECT money FROM players WHERE citizenid = '" .. identifier .. "'")
     local targetMoney = json.decode(result[1].money)
     targetMoney.bank = targetMoney.bank + payment
-    ExecuteSql("UPDATE players SET money = '"..json.encode(targetMoney).."' WHERE citizenid = '"..identifier.."'")
+    ExecuteSql("UPDATE players SET money = '" .. json.encode(targetMoney) .. "' WHERE citizenid = '" .. identifier .. "'")
 end
 
 function RemoveAddBankMoneyOnline(type, amount, id)
@@ -646,7 +659,7 @@ end
 function GetPlayers()
     local resulttable = {}
     local data = ExecuteSql("SELECT * FROM `real_bank`")
-    if data or data[1] then 
+    if data or data[1] then
         for k, v in pairs(data) do
             local a = json.decode(v.info)
             table.insert(resulttable, {
@@ -661,7 +674,7 @@ function GetPlayers()
 end
 
 function GetPassword(iban)
-    local data = ExecuteSql("SELECT `password` FROM `real_bank` WHERE `iban` = '"..iban.."'")
+    local data = ExecuteSql("SELECT `password` FROM `real_bank` WHERE `iban` = '" .. iban .. "'")
     if #data > 0 then
         local Password = tostring(data[1].password)
         return Password
@@ -674,11 +687,11 @@ function GetIBAN(source, identifier, IsSoruce)
     if IsSoruce then
         local source = source
         local ident = GetIdentifier(source)
-        local data = ExecuteSql("SELECT `iban` FROM `real_bank` WHERE `identifier` = '"..ident.."'")
+        local data = ExecuteSql("SELECT `iban` FROM `real_bank` WHERE `identifier` = '" .. ident .. "'")
         local IBAN = json.decode(data[1].iban)
         return IBAN
     else
-        local data = ExecuteSql("SELECT `iban` FROM `real_bank` WHERE `identifier` = '"..identifier.."'")
+        local data = ExecuteSql("SELECT `iban` FROM `real_bank` WHERE `identifier` = '" .. identifier .. "'")
         local IBAN = json.decode(data[1].iban)
         return IBAN
     end
@@ -687,12 +700,13 @@ end
 function GiveCredit(playersource, amount)
     local source = playersource
     local ident = GetIdentifier(source)
-    local data = ExecuteSql("SELECT `credit` FROM `real_bank` WHERE `identifier` = '"..ident.."'")
+    local data = ExecuteSql("SELECT `credit` FROM `real_bank` WHERE `identifier` = '" .. ident .. "'")
     local Credit = json.decode(data[1].credit)
 
     if #data > 0 then
         Credit.playercreditpoint = Credit.playercreditpoint + amount
-        ExecuteSql("UPDATE `real_bank` SET `credit` = '"..json.encode(Credit).."' WHERE `identifier` = '"..ident.."'")
+        ExecuteSql("UPDATE `real_bank` SET `credit` = '" .. json.encode(Credit) .. "' WHERE `identifier` = '" ..
+        ident .. "'")
     else
         print("Data not found")
     end
@@ -703,7 +717,7 @@ function SendLog(playersource, received, sendedto, type, amount, pp)
     local ident = GetIdentifier(source)
     local GetPlayerName = GetName(source)
     local DiscordAvatar = GetDiscordAvatar(source)
-    local data = ExecuteSql("SELECT `transaction` FROM `real_bank` WHERE `identifier` = '"..ident.."'")
+    local data = ExecuteSql("SELECT `transaction` FROM `real_bank` WHERE `identifier` = '" .. ident .. "'")
     local Transaction = json.decode(data[1].transaction)
 
     if #data > 0 then
@@ -718,7 +732,7 @@ function SendLog(playersource, received, sendedto, type, amount, pp)
         end
 
         TableID = #Transaction + 1
-        
+
         table.insert(Transaction, {
             id = TableID,
             name = GetPlayerName,
@@ -729,7 +743,8 @@ function SendLog(playersource, received, sendedto, type, amount, pp)
             pp = pp,
             date = GetCurrentDate(),
         })
-        ExecuteSql("UPDATE `real_bank` SET `transaction` = '"..json.encode(Transaction).."' WHERE `identifier` = '"..ident.."'")
+        ExecuteSql("UPDATE `real_bank` SET `transaction` = '" ..
+        json.encode(Transaction) .. "' WHERE `identifier` = '" .. ident .. "'")
         TriggerClientEvent('real-bank:UpdateUITransaction', source)
     else
         print("Data not found")
@@ -738,7 +753,7 @@ end
 
 function SendOfflineLog(sendersource, identifier, playername, received, sendedto, type, amount, pp)
     local source = sendersource
-    local data = ExecuteSql("SELECT `transaction` FROM `real_bank` WHERE `identifier` = '"..identifier.."'")
+    local data = ExecuteSql("SELECT `transaction` FROM `real_bank` WHERE `identifier` = '" .. identifier .. "'")
     local Transaction = json.decode(data[1].transaction)
     local DiscordAvatar = GetDiscordAvatar(source)
 
@@ -754,7 +769,7 @@ function SendOfflineLog(sendersource, identifier, playername, received, sendedto
         end
 
         TableID = #Transaction + 1
-        
+
         table.insert(Transaction, {
             id = TableID,
             name = playername,
@@ -765,7 +780,8 @@ function SendOfflineLog(sendersource, identifier, playername, received, sendedto
             pp = pp,
             date = GetCurrentDate(),
         })
-        ExecuteSql("UPDATE `real_bank` SET `transaction` = '"..json.encode(Transaction).."' WHERE `identifier` = '"..identifier.."'")
+        ExecuteSql("UPDATE `real_bank` SET `transaction` = '" ..
+        json.encode(Transaction) .. "' WHERE `identifier` = '" .. identifier .. "'")
     else
         print("Data not found")
     end
@@ -839,17 +855,36 @@ function ExecuteSql(query)
 end
 
 -- Society Account Exports
+Citizen.CreateThread(function()
+    ExecuteSql([[
+        CREATE TABLE IF NOT EXISTS `management_funds` (
+        `id` INT(11) NOT NULL AUTO_INCREMENT,
+        `job_name` VARCHAR(50) NOT NULL,
+        `amount` INT(11) NOT NULL,
+        `type` VARCHAR(50) NOT NULL DEFAULT 'boss',
+        PRIMARY KEY (`id`),
+        UNIQUE KEY `job_name` (`job_name`),
+        KEY `type` (`type`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+    ]])
+end)
+
+local function EnsureSocietyAccount(society)
+    if not society then return 0 end
+    local result = ExecuteSql("SELECT `amount` FROM `management_funds` WHERE `job_name` = '" .. society .. "'")
+    if not result or not result[1] then
+        ExecuteSql("INSERT IGNORE INTO `management_funds` (`job_name`, `amount`, `type`) VALUES ('" .. society .. "', 0, 'boss')")
+        return 0
+    end
+    return tonumber(result[1].amount) or 0
+end
+
 function GetSocietyMoney(society)
     local amount = 0
     if GetResourceState('qb-management') == 'started' then
-        amount = exports['qb-management']:GetAccount(society)
-    elseif GetResourceState('ox_inventory') == 'started' then
-        local account = exports.ox_inventory:GetAccount('society_'..society)
-        amount = account and account.balance or 0
-    elseif GetResourceState('qbx_management') == 'started' then
-        pcall(function()
-            amount = exports['qbx_management']:GetAccount(society)
-        end)
+        pcall(function() amount = exports['qb-management']:GetAccount(society) end)
+    else
+        amount = EnsureSocietyAccount(society)
     end
     return amount or 0
 end
@@ -857,33 +892,32 @@ end
 exports('getAccountMoney', GetSocietyMoney)
 exports('GetBalance', GetSocietyMoney) -- Alias
 
-exports('addAccountMoney', function(society, amount)
+local function AddSocietyMoney(society, amount)
     if GetResourceState('qb-management') == 'started' then
-        exports['qb-management']:AddMoney(society, amount)
-    elseif GetResourceState('qbx_management') == 'started' then
-        pcall(function()
-            exports['qbx_management']:AddMoney(society, amount)
-        end)
-    elseif GetResourceState('ox_inventory') == 'started' then
-        exports.ox_inventory:AdjustAccountBalance('society_'..society, amount)
+        pcall(function() exports['qb-management']:AddMoney(society, amount) end)
+    else
+        EnsureSocietyAccount(society)
+        ExecuteSql("UPDATE `management_funds` SET `amount` = `amount` + " .. amount .. " WHERE `job_name` = '" .. society .. "'")
     end
-end)
+    return true
+end
+exports('addAccountMoney', AddSocietyMoney)
 
-exports('removeAccountMoney', function(society, amount)
+local function RemoveSocietyMoney(society, amount)
     if GetResourceState('qb-management') == 'started' then
-        exports['qb-management']:RemoveMoney(society, amount)
-    elseif GetResourceState('qbx_management') == 'started' then
-        pcall(function()
-            exports['qbx_management']:RemoveMoney(society, amount)
-        end)
-    elseif GetResourceState('ox_inventory') == 'started' then
-        exports.ox_inventory:AdjustAccountBalance('society_'..society, -amount)
+        pcall(function() exports['qb-management']:RemoveMoney(society, amount) end)
+    else
+        EnsureSocietyAccount(society)
+        ExecuteSql("UPDATE `management_funds` SET `amount` = `amount` - " .. amount .. " WHERE `job_name` = '" .. society .. "'")
     end
-end)
+    return true
+end
+exports('removeAccountMoney', RemoveSocietyMoney)
 
 -- Player Money Exports
 exports('AddMoney', function(target, type, amount, reason)
-    local Player = type(target) == 'number' and frameworkObject.Functions.GetPlayer(target) or frameworkObject.Functions.GetPlayerByCitizenId(target)
+    local Player = type(target) == 'number' and frameworkObject.Functions.GetPlayer(target) or
+    frameworkObject.Functions.GetPlayerByCitizenId(target)
     if Player then
         return Player.Functions.AddMoney(type, amount, reason)
     end
@@ -891,7 +925,8 @@ exports('AddMoney', function(target, type, amount, reason)
 end)
 
 exports('RemoveMoney', function(target, type, amount, reason)
-    local Player = type(target) == 'number' and frameworkObject.Functions.GetPlayer(target) or frameworkObject.Functions.GetPlayerByCitizenId(target)
+    local Player = type(target) == 'number' and frameworkObject.Functions.GetPlayer(target) or
+    frameworkObject.Functions.GetPlayerByCitizenId(target)
     if Player then
         return Player.Functions.RemoveMoney(type, amount, reason)
     end
@@ -909,21 +944,13 @@ RegisterNetEvent('real-bank:DepositSociety', function(society, amount)
     local Player = frameworkObject.Functions.GetPlayer(src)
 
     if not Player or not payment or payment <= 0 then return end
-    
+
     if (Player.PlayerData.job.name ~= society and Player.PlayerData.gang.name ~= society) then return end
     if (not Player.PlayerData.job.isboss and not Player.PlayerData.gang.isboss) then return end
 
     if Player.PlayerData.money.bank >= payment then
         Player.Functions.RemoveMoney('bank', payment)
-        if GetResourceState('qb-management') == 'started' then
-            exports['qb-management']:AddMoney(society, payment)
-        elseif GetResourceState('ox_inventory') == 'started' then
-            exports.ox_inventory:AddAccountMoney('society_'..society, payment)
-        elseif GetResourceState('qbx_management') == 'started' then
-            pcall(function()
-                exports['qbx_management']:AddMoney(society, payment)
-            end)
-        end
+        AddSocietyMoney(society, payment)
         Config.Notification(Config.Language['successfully_deposited'] or 'Successfully deposited', 'success', true, src)
     else
         Config.Notification(Config.Language['not_enough_money'] or 'Not enough money', 'error', true, src)
@@ -936,26 +963,17 @@ RegisterNetEvent('real-bank:WithdrawSociety', function(society, amount)
     local Player = frameworkObject.Functions.GetPlayer(src)
 
     if not Player or not payment or payment <= 0 then return end
-    
+
     if (Player.PlayerData.job.name ~= society and Player.PlayerData.gang.name ~= society) then return end
     if (not Player.PlayerData.job.isboss and not Player.PlayerData.gang.isboss) then return end
 
     local accMoney = GetSocietyMoney(society)
 
     if accMoney and accMoney >= payment then
-        if GetResourceState('qb-management') == 'started' then
-            exports['qb-management']:RemoveMoney(society, payment)
-        elseif GetResourceState('ox_inventory') == 'started' then
-            exports.ox_inventory:RemoveAccountMoney('society_'..society, payment)
-        elseif GetResourceState('qbx_management') == 'started' then
-            pcall(function()
-                exports['qbx_management']:RemoveMoney(society, payment)
-            end)
-        end
+        RemoveSocietyMoney(society, payment)
         Player.Functions.AddMoney('bank', payment)
         Config.Notification(Config.Language['successfylly_withdrawed'] or 'Successfully withdrawed', 'success', true, src)
     else
         Config.Notification('Society does not have enough money', 'error', true, src)
     end
 end)
-
