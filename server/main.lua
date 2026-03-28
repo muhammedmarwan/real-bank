@@ -63,7 +63,7 @@ Citizen.CreateThread(function()
                         if getcredittable.debt > 0 then
                             if getdatefromdata ~= 0 or getdatefromdata ~= '' or getdatefromdata ~= "" or getdatefromdata ~= nil then
                                 if tostring(currenttime) > tostring(getdatefromdata) then
-                                    TriggerEvent('real-bank:PayCreditDebts')
+                                    TriggerEvent('real-bank:PayCreditDebts', src)
                                     Citizen.Wait(100)
                                     if StatusThing == true then
                                         local a = json.decode(data[1].info)
@@ -278,7 +278,7 @@ RegisterNetEvent('real-bank:ChangePassword', function(newpassword)
     local data = ExecuteSql("SELECT `identifier` FROM `real_bank` WHERE `identifier` = '" .. ident .. "'")
 
     if data[1] then
-        ExecuteSql("UPDATE `real_bank` SET `password` = '" .. newpassword .. "' WHERE `identifier` = '" .. ident .. "'")
+        ExecuteSql("UPDATE `real_bank` SET `password` = '" .. SqlEscape(tostring(newpassword)) .. "' WHERE `identifier` = '" .. ident .. "'")
     else
         print('No data found for identifier')
     end
@@ -313,7 +313,7 @@ RegisterNetEvent('real-bank:CreditConfirm', function(data)
     local ident = GetIdentifier(src)
     local sqldata = ExecuteSql("SELECT `credit` FROM `real_bank` WHERE `identifier` = '" .. ident .. "'")
     local a = json.decode(sqldata[1].credit)
-    if a.credid == '' or a.cerdid == "" or a.credid == nil then
+    if a.credid == nil or a.credid == '' then
         if Config.RequireCreditPoint then
             if a.playercreditpoint > data.credreq then
                 a.playercreditpoint = a.playercreditpoint - data.credreq
@@ -346,14 +346,15 @@ RegisterNetEvent('real-bank:CreditConfirm', function(data)
     end
 end)
 
-RegisterNetEvent('real-bank:PayCreditDebts', function()
-    local ident = GetIdentifier(PlayerSource)
+RegisterNetEvent('real-bank:PayCreditDebts', function(srcArg)
+    local srcToUse = srcArg or PlayerSource
+    local ident = GetIdentifier(srcToUse)
     local data = ExecuteSql("SELECT `credit` FROM `real_bank` WHERE `identifier` = '" .. ident .. "'")
-    local GetPlayerMoney = GetPlayerMoneyOnline('bank', PlayerSource)
+    local GetPlayerMoney = GetPlayerMoneyOnline('bank', srcToUse)
     local a = json.decode(data[1].credit)
     if a.debt > 0 then
         if GetPlayerMoney > tonumber(a.debt) then
-            NewCreditTable = {
+            local NewCreditTable = {
                 playercreditpoint = a.playercreditpoint,
                 activecredit = '',
                 creditlastdate = 0,
@@ -361,11 +362,11 @@ RegisterNetEvent('real-bank:PayCreditDebts', function()
             }
             ExecuteSql("UPDATE `real_bank` SET `credit` = '" ..
             json.encode(NewCreditTable) .. "' WHERE `identifier` = '" .. ident .. "'")
-            RemoveAddBankMoneyOnline('remove', tonumber(a.debt), PlayerSource)
+            RemoveAddBankMoneyOnline('remove', tonumber(a.debt), srcToUse)
             StatusThing = true
         else
             StatusThing = false
-            Config.Notification(Config.Language['no_money_to_pay_debts'], 'error', true, source)
+            Config.Notification(Config.Language['no_money_to_pay_debts'], 'error', true, srcToUse)
         end
     end
 end)
@@ -659,7 +660,7 @@ end
 function GetPlayers()
     local resulttable = {}
     local data = ExecuteSql("SELECT * FROM `real_bank`")
-    if data or data[1] then
+    if data and data[1] then
         for k, v in pairs(data) do
             local a = json.decode(v.info)
             table.insert(resulttable, {
@@ -688,11 +689,11 @@ function GetIBAN(source, identifier, IsSoruce)
         local source = source
         local ident = GetIdentifier(source)
         local data = ExecuteSql("SELECT `iban` FROM `real_bank` WHERE `identifier` = '" .. ident .. "'")
-        local IBAN = json.decode(data[1].iban)
+        local IBAN = data[1].iban
         return IBAN
     else
         local data = ExecuteSql("SELECT `iban` FROM `real_bank` WHERE `identifier` = '" .. identifier .. "'")
-        local IBAN = json.decode(data[1].iban)
+        local IBAN = data[1].iban
         return IBAN
     end
 end
@@ -701,15 +702,16 @@ function GiveCredit(playersource, amount)
     local source = playersource
     local ident = GetIdentifier(source)
     local data = ExecuteSql("SELECT `credit` FROM `real_bank` WHERE `identifier` = '" .. ident .. "'")
-    local Credit = json.decode(data[1].credit)
 
-    if #data > 0 then
-        Credit.playercreditpoint = Credit.playercreditpoint + amount
-        ExecuteSql("UPDATE `real_bank` SET `credit` = '" .. json.encode(Credit) .. "' WHERE `identifier` = '" ..
-        ident .. "'")
-    else
-        print("Data not found")
+    if not data or #data == 0 then
+        print("[real-bank] GiveCredit: No bank account found for " .. tostring(ident))
+        return
     end
+
+    local Credit = json.decode(data[1].credit)
+    Credit.playercreditpoint = Credit.playercreditpoint + amount
+    ExecuteSql("UPDATE `real_bank` SET `credit` = '" .. json.encode(Credit) .. "' WHERE `identifier` = '" ..
+    ident .. "'")
 end
 
 function SendLog(playersource, received, sendedto, type, amount, pp)
@@ -915,20 +917,20 @@ end
 exports('removeAccountMoney', RemoveSocietyMoney)
 
 -- Player Money Exports
-exports('AddMoney', function(target, type, amount, reason)
+exports('AddMoney', function(target, moneyType, amount, reason)
     local Player = type(target) == 'number' and frameworkObject.Functions.GetPlayer(target) or
     frameworkObject.Functions.GetPlayerByCitizenId(target)
     if Player then
-        return Player.Functions.AddMoney(type, amount, reason)
+        return Player.Functions.AddMoney(moneyType, amount, reason)
     end
     return false
 end)
 
-exports('RemoveMoney', function(target, type, amount, reason)
+exports('RemoveMoney', function(target, moneyType, amount, reason)
     local Player = type(target) == 'number' and frameworkObject.Functions.GetPlayer(target) or
     frameworkObject.Functions.GetPlayerByCitizenId(target)
     if Player then
-        return Player.Functions.RemoveMoney(type, amount, reason)
+        return Player.Functions.RemoveMoney(moneyType, amount, reason)
     end
     return false
 end)

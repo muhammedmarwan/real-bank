@@ -23,6 +23,11 @@ function DiscordRequest(method, endpoint, jsondata)
 end
 
 function GetDiscordAvatar(user)
+    -- Skip all HTTP fetching if no bot token is configured
+    if not Config.DiscordBotToken or Config.DiscordBotToken == '' then
+        return "https://cdn.discordapp.com/embed/avatars/0.png"
+    end
+
     local discordId = nil
     local imgURL = nil
     for _, id in ipairs(GetPlayerIdentifiers(user)) do
